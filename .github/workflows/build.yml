@@ -14,11 +14,13 @@ jobs:
       matrix:
         include:
           - os: macos-latest
-            artifact: 书法字体制作器-mac
-            ext: .zip
+            arch: arm64
+            artifact: 书法字体制作器-mac-arm64
+          - os: macos-13
+            arch: x86_64
+            artifact: 书法字体制作器-mac-x86_64
           - os: windows-latest
             artifact: 书法字体制作器-win
-            ext: .zip
 
     runs-on: ${{ matrix.os }}
 
@@ -69,16 +71,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download macOS artifact
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: 书法字体制作器-mac
-          path: ./artifacts
-
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: 书法字体制作器-win
           path: ./artifacts
 
       - name: Create Release
