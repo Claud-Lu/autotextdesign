@@ -46,3 +46,7 @@ env/
 # Test artifacts
 test-font.ttf
 test.html
+
+# Build artifacts
+*.app
+*.zip

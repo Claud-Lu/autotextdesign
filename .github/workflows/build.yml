@@ -1,0 +1,88 @@
+name: Build Desktop Apps
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            artifact: 书法字体制作器-mac
+            ext: .zip
+          - os: windows-latest
+            artifact: 书法字体制作器-win
+            ext: .zip
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install tesseract (macOS)
+        if: runner.os == 'macOS'
+        run: brew install tesseract
+
+      - name: Install tesseract (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install tesseract --no-progress
+          echo "C:\Program Files\Tesseract-OCR" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pywebview pyinstaller
+
+      - name: Build with PyInstaller
+        run: pyinstaller calligraphy.spec --noconfirm --clean
+
+      - name: Package (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cd dist
+          zip -r -9 "../${{ matrix.artifact }}.zip" "书法字体制作器.app"
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "dist\书法字体制作器" -DestinationPath "${{ matrix.artifact }}.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: 书法字体制作器-mac
+          path: ./artifacts
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: 书法字体制作器-win
+          path: ./artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
