@@ -285,7 +285,7 @@
             border: 1px solid var(--border-light);
             border-radius: var(--radius);
             padding: 1.5rem;
-            margin-top: 1.75rem;
+            margin-bottom: 1.75rem;
             box-shadow: var(--shadow-sm);
         }
 
@@ -468,16 +468,6 @@
             </div>
         </div>
 
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab active" data-tab="pending">待确认 <span id="pendingCount">(0)</span></button>
-            <button class="tab" data-tab="confirmed">已收录 <span id="confirmedCount">(0)</span></button>
-        </div>
-
-        <!-- Grids -->
-        <div id="pendingGrid" class="character-grid"></div>
-        <div id="confirmedGrid" class="character-grid" style="display: none;"></div>
-
         <!-- Preview -->
         <div class="preview-section" id="previewSection">
             <h3>字体预览</h3>
@@ -507,10 +497,20 @@
                 </div>
             </div>
         </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="pending">待确认 <span id="pendingCount">(0)</span></button>
+            <button class="tab" data-tab="confirmed">已收录 <span id="confirmedCount">(0)</span></button>
+        </div>
+
+        <!-- Grids -->
+        <div id="pendingGrid" class="character-grid"></div>
+        <div id="confirmedGrid" class="character-grid" style="display: none;"></div>
     </main>
 
     <footer class="footer">
-        <p>书法字体制作器 — 由 <strong>谷子</strong> 研发</p>
+        <p>书法字体制作器 — 由 <strong>谷子、小兽</strong> 研发</p>
     </footer>
 
     <!-- About Modal -->
@@ -530,7 +530,7 @@
                 </a>
             </div>
             <div class="about-credit">
-                <p>由 <span class="author">谷子</span> 研发</p>
+                <p>由 <span class="author">谷子、小兽</span> 研发</p>
                 <p style="margin-top: 0.25rem;">有任何意见或建议，欢迎添加微信</p>
                 <p class="about-wechat" style="margin-top: 0.375rem;">shibuyasan</p>
             </div>
