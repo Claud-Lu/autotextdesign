@@ -5,411 +5,353 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>书法字体制作器</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --color-primary: #C84032;
-            --color-primary-hover: #A83022;
-            --color-bg: #F8F7F5;
-            --color-surface: #FFFFFF;
-            --color-text: #1A1A1A;
-            --color-muted: #6B7280;
-            --color-border: #E5E5E5;
-            --color-success: #10B981;
-            --color-warning: #F59E0B;
-            --color-error: #EF4444;
-            --radius: 8px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.08);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --cinnabar: #B8433A;
+            --cinnabar-deep: #8C2F28;
+            --cinnabar-light: rgba(184, 67, 58, 0.08);
+            --ink: #1C1917;
+            --ink-secondary: #44403C;
+            --ink-muted: #78716C;
+            --ink-faint: #A8A29E;
+            --paper: #F5F0EB;
+            --card: #FDFAF7;
+            --card-alt: #F9F5F0;
+            --gold: #C9A96E;
+            --gold-light: rgba(201, 169, 110, 0.15);
+            --success: #5B8C5A;
+            --error: #C75050;
+            --border: #E0D8D0;
+            --border-light: #EDE8E2;
+            --radius: 10px;
+            --radius-sm: 6px;
+            --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.05);
+            --shadow: 0 2px 8px rgba(28, 25, 23, 0.06), 0 1px 2px rgba(28, 25, 23, 0.04);
+            --shadow-lg: 0 12px 32px rgba(28, 25, 23, 0.08), 0 2px 8px rgba(28, 25, 23, 0.04);
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: var(--color-bg);
-            color: var(--color-text);
+            font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", "PingFang SC", serif;
+            background: var(--paper);
+            color: var(--ink);
             min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(184, 67, 58, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(201, 169, 110, 0.04) 0%, transparent 40%);
         }
 
-        /* Header */
         .header {
-            background: var(--color-primary);
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: var(--shadow);
+            background: var(--ink);
+            color: #F5F0EB;
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         .header-content {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 2rem;
+            gap: 1rem;
+            padding: 0.875rem 2rem;
+            border-bottom: 2px solid var(--cinnabar);
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 500;
-            letter-spacing: 0.05em;
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
         }
 
-        .project-selector {
+        .header-actions {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            flex: 1;
-            max-width: 500px;
+            gap: 0.625rem;
         }
 
-        .project-select {
-            flex: 1;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: var(--radius);
-            background: rgba(255,255,255,0.2);
-            color: white;
-            font-size: 1rem;
-            cursor: pointer;
+        .header-actions a {
+            color: #A8A29E;
+            transition: color 0.2s;
+            display: flex;
         }
-
-        .project-select option {
-            background: var(--color-surface);
-            color: var(--color-text);
-        }
+        .header-actions a:hover { color: #F5F0EB; }
 
         .btn {
-            padding: 0.5rem 1rem;
+            padding: 0.4375rem 0.875rem;
             border: none;
-            border-radius: var(--radius);
-            font-size: 0.875rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8125rem;
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 500;
+            font-family: inherit;
+            letter-spacing: 0.03em;
         }
 
-        .btn-primary {
-            background: white;
-            color: var(--color-primary);
-        }
+        .btn-primary { background: var(--cinnabar); color: #fff; }
+        .btn-primary:hover { background: var(--cinnabar-deep); }
+        .btn-ghost { background: rgba(245, 240, 235, 0.08); color: #A8A29E; }
+        .btn-ghost:hover { background: rgba(245, 240, 235, 0.15); color: #F5F0EB; }
+        .btn-danger-outline { background: transparent; color: var(--ink-faint); border: 1px solid var(--border); }
+        .btn-danger-outline:hover { border-color: var(--error); color: var(--error); }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-success:hover { background: #4A7A49; }
 
-        .btn-primary:hover {
-            background: rgba(255,255,255,0.9);
-        }
-
-        .btn-danger {
-            background: rgba(239,68,68,0.2);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: rgba(239,68,68,0.3);
-        }
-
-        .btn-success {
-            background: var(--color-success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        /* Main Content */
         .main {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
-        .project-info {
-            background: var(--color-surface);
+        /* Toolbar */
+        .toolbar {
+            background: var(--card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+            flex-wrap: wrap;
+        }
+
+        .toolbar-label {
+            font-size: 0.8125rem;
+            color: var(--ink-muted);
+            white-space: nowrap;
+        }
+
+        .font-name-input {
+            padding: 0.4375rem 0.625rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-family: inherit;
+            background: var(--card-alt);
+            color: var(--ink);
+            width: 160px;
+            transition: border-color 0.2s;
+        }
+        .font-name-input:focus { outline: none; border-color: var(--cinnabar); }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+        }
+
+        .stat-chip {
+            font-size: 0.8125rem;
+            color: var(--ink-muted);
+        }
+        .stat-chip strong {
+            color: var(--cinnabar);
+            font-weight: 700;
+        }
+
+        /* Upload */
+        .upload-section {
+            background: var(--card);
+            border: 1px solid var(--border-light);
             border-radius: var(--radius);
             padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin-bottom: 1.75rem;
+            box-shadow: var(--shadow-sm);
         }
 
-        .project-stats {
-            display: flex;
-            gap: 3rem;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2rem;
+        .section-title {
+            font-size: 0.9375rem;
             font-weight: 600;
-            color: var(--color-primary);
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: var(--color-muted);
-        }
-
-        /* Upload Section */
-        .upload-section {
-            background: var(--color-surface);
-            border-radius: var(--radius);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-        }
-
-        .upload-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        .upload-area {
-            border: 2px dashed var(--color-border);
-            border-radius: var(--radius);
-            padding: 3rem 2rem;
-            text-align: center;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .upload-area:hover {
-            border-color: var(--color-primary);
-            background: rgba(200,64,50,0.05);
-        }
-
-        .upload-area.dragover {
-            border-color: var(--color-primary);
-            background: rgba(200,64,50,0.1);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
+            letter-spacing: 0.05em;
             margin-bottom: 1rem;
-        }
-
-        .upload-title {
-            font-size: 1.125rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .upload-hint {
-            font-size: 0.875rem;
-            color: var(--color-muted);
-        }
-
-        .mode-selector {
-            margin-top: 1rem;
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        .mode-option {
+            color: var(--ink-secondary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-
-        .grid-inputs {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
+        .section-title::before {
+            content: '';
+            width: 3px;
+            height: 1em;
+            background: var(--cinnabar);
+            border-radius: 2px;
         }
 
-        .grid-inputs input {
-            width: 80px;
-            padding: 0.5rem;
-            border: 1px solid var(--color-border);
+        .upload-area {
+            border: 2px dashed var(--border);
             border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: all 0.25s var(--ease);
+            cursor: pointer;
+            background: var(--card-alt);
         }
+        .upload-area:hover { border-color: var(--cinnabar); background: var(--cinnabar-light); }
+        .upload-area.dragover { border-color: var(--cinnabar); background: var(--cinnabar-light); transform: scale(1.005); }
+
+        .upload-icon { font-size: 2.25rem; margin-bottom: 0.75rem; opacity: 0.7; }
+        .upload-title { font-size: 1rem; font-weight: 500; margin-bottom: 0.375rem; color: var(--ink-secondary); }
+        .upload-hint { font-size: 0.8125rem; color: var(--ink-faint); }
 
         /* Tabs */
         .tabs {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--color-border);
+            gap: 0;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
         }
-
         .tab {
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             background: none;
             border: none;
             border-bottom: 2px solid transparent;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.875rem;
             font-weight: 500;
-            color: var(--color-muted);
-            margin-bottom: -2px;
+            color: var(--ink-muted);
+            margin-bottom: -1px;
             transition: all 0.2s;
+            font-family: inherit;
         }
+        .tab:hover { color: var(--ink-secondary); }
+        .tab.active { color: var(--cinnabar); border-bottom-color: var(--cinnabar); }
+        .tab span { font-size: 0.75rem; color: var(--ink-faint); }
+        .tab.active span { color: var(--cinnabar); opacity: 0.6; }
 
-        .tab:hover {
-            color: var(--color-primary);
-        }
-
-        .tab.active {
-            color: var(--color-primary);
-            border-bottom-color: var(--color-primary);
-        }
-
-        /* Character Grid */
+        /* Grid */
         .character-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(164px, 1fr));
+            gap: 1.25rem;
         }
 
         .char-card {
-            background: var(--color-surface);
+            background: var(--card);
+            border: 1px solid var(--border-light);
             border-radius: var(--radius);
             overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: all 0.2s;
+            transition: all 0.25s var(--ease);
+            box-shadow: var(--shadow-sm);
         }
-
-        .char-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-        }
+        .char-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); border-color: var(--border); }
 
         .char-image {
             width: 100%;
             aspect-ratio: 1;
-            background: #f5f5f5;
+            background: var(--card-alt);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-light);
         }
+        .char-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        .char-image img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .char-content {
-            padding: 1rem;
-        }
-
-        .ocr-candidates {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .ocr-btn {
-            padding: 0.25rem 0.5rem;
-            background: var(--color-bg);
-            border: 1px solid var(--color-border);
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-
-        .ocr-btn:hover {
-            border-color: var(--color-primary);
-            color: var(--color-primary);
-        }
+        .char-content { padding: 0.875rem; }
 
         .char-input {
             width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius);
+            padding: 0.5rem 0.625rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
             font-size: 1rem;
+            font-family: inherit;
             margin-bottom: 0.5rem;
-        }
-
-        .char-input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-        }
-
-        .char-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .char-actions .btn {
-            flex: 1;
-        }
-
-        .similar-hint {
-            font-size: 0.75rem;
-            color: var(--color-muted);
-            margin-top: 0.5rem;
-        }
-
-        /* Confirmed Character */
-        .confirmed-char .char-image {
-            background: linear-gradient(135deg, rgba(200,64,50,0.1) 0%, rgba(200,64,50,0.05) 100%);
-        }
-
-        .confirmed-label {
+            background: var(--card-alt);
+            transition: border-color 0.2s;
             text-align: center;
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--color-primary);
-            padding: 0.5rem;
+            letter-spacing: 0.1em;
         }
+        .char-input:focus { outline: none; border-color: var(--cinnabar); background: var(--card); }
+        .char-input::placeholder { color: var(--ink-faint); font-size: 0.8125rem; letter-spacing: 0; }
 
-        /* Preview Section */
+        .char-actions { display: flex; gap: 0.5rem; }
+        .char-actions .btn { flex: 1; padding: 0.4375rem 0; }
+
+        .confirmed-char .char-image { background: var(--cinnabar-light); border-bottom: 1px solid rgba(184, 67, 58, 0.1); }
+        .confirmed-label { text-align: center; font-size: 1.75rem; font-weight: 700; color: var(--cinnabar); padding: 0.5rem 0; letter-spacing: 0.05em; }
+        .confirmed-actions { padding: 0 0.875rem 0.875rem; }
+        .confirmed-actions .btn { width: 100%; }
+
+        /* Preview */
         .preview-section {
-            background: var(--color-surface);
+            background: var(--card);
+            border: 1px solid var(--border-light);
             border-radius: var(--radius);
-            padding: 2rem;
-            margin-top: 2rem;
-            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-top: 1.75rem;
+            box-shadow: var(--shadow-sm);
         }
 
-        .preview-controls {
-            display: flex;
-            gap: 1rem;
+        .preview-section h3 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
             margin-bottom: 1rem;
+            color: var(--ink-secondary);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .preview-section h3::before {
+            content: '';
+            width: 3px; height: 1em;
+            background: var(--gold);
+            border-radius: 2px;
         }
 
-        .preview-controls input,
-        .preview-controls select {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius);
+        .preview-toolbar {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
         }
+        .preview-toolbar select {
+            padding: 0.375rem 0.625rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.8125rem;
+            background: var(--card-alt);
+            color: var(--ink-secondary);
+        }
+        .font-status { font-size: 0.8125rem; color: var(--ink-faint); }
 
+        .preview-textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 1.25rem;
+            line-height: 1.8;
+            background: var(--card-alt);
+            color: var(--ink);
+            transition: border-color 0.2s;
+            letter-spacing: 0.05em;
+        }
+        .preview-textarea:focus { outline: none; border-color: var(--cinnabar); }
+
+        .preview-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .custom-font { font-family: 'PreviewFont', serif; }
+        .system-font { font-family: "PingFang SC", "STKaiti", "KaiTi", serif; }
+        .preview-label { font-size: 0.75rem; color: var(--ink-faint); margin-bottom: 0.5rem; letter-spacing: 0.05em; }
         .preview-area {
-            min-height: 200px;
-            background: var(--color-bg);
-            border-radius: var(--radius);
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .preview-text {
-            font-size: 48px;
-            line-height: 1.5;
-            white-space: pre-wrap;
+            min-height: 100px;
+            padding: 1.25rem;
+            background: var(--card-alt);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            line-height: 1.6;
             word-break: break-all;
-        }
-
-        .preview-text.missing-char {
-            color: var(--color-muted);
-            font-size: 24px;
+            color: var(--ink);
         }
 
         /* Modal */
@@ -417,830 +359,285 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(28, 25, 23, 0.45);
+            backdrop-filter: blur(4px);
             align-items: center;
             justify-content: center;
             z-index: 1000;
         }
-
-        .modal.show {
-            display: flex;
-        }
-
+        .modal.show { display: flex; }
         .modal-content {
-            background: var(--color-surface);
-            border-radius: var(--radius);
+            background: var(--card);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
             padding: 2rem;
-            max-width: 500px;
+            max-width: 460px;
             width: 90%;
             box-shadow: var(--shadow-lg);
         }
+        .modal-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; letter-spacing: 0.05em; }
+        .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+        .modal-actions .btn { padding: 0.5rem 1.25rem; }
 
-        .modal-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .modal-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius);
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-        }
+        .about-divider { width: 40px; height: 2px; background: var(--gold); border-radius: 1px; margin: 1.25rem auto; }
+        .about-body { font-size: 0.875rem; color: var(--ink-muted); line-height: 1.8; margin-bottom: 1.25rem; }
+        .about-credit { padding: 1rem; background: var(--card-alt); border-radius: var(--radius-sm); border: 1px solid var(--border-light); }
+        .about-credit p { font-size: 0.8125rem; color: var(--ink-muted); line-height: 1.8; }
+        .about-credit .author { color: var(--cinnabar); font-weight: 600; }
+        .about-wechat { font-size: 1rem !important; font-weight: 600; color: var(--ink) !important; letter-spacing: 0.08em; }
 
         /* Toast */
         .toast {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: var(--color-text);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: var(--radius);
+            background: var(--ink);
+            color: #F5F0EB;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-sm);
             box-shadow: var(--shadow-lg);
             z-index: 1001;
-            animation: slideIn 0.3s ease;
+            font-size: 0.8125rem;
+            letter-spacing: 0.03em;
+            animation: toastIn 0.3s var(--ease);
         }
+        .toast.toast-success { background: var(--success); }
+        .toast.toast-error { background: var(--error); }
+        @keyframes toastIn { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
+        .empty-state { text-align: center; padding: 3rem 2rem; color: var(--ink-faint); }
+        .empty-state-icon { font-size: 3rem; margin-bottom: 0.75rem; opacity: 0.5; }
+        .empty-state-text { font-size: 0.9375rem; }
+        .empty-state-text p:last-child { font-size: 0.8125rem; margin-top: 0.375rem; }
 
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--color-muted);
-        }
+        .footer { text-align: center; padding: 2.5rem 2rem; color: var(--ink-faint); font-size: 0.75rem; letter-spacing: 0.05em; }
+        .footer strong { color: var(--ink-muted); }
 
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .empty-state-text {
-            font-size: 1.125rem;
-        }
-
-        /* Loading */
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.2);
             border-radius: 50%;
             border-top-color: white;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .upload-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .character-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            }
-
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .project-selector {
-                max-width: 100%;
-            }
+            .header-content { flex-direction: column; gap: 0.75rem; padding: 0.75rem 1.25rem; }
+            .main { padding: 1.25rem; }
+            .character-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; }
+            .preview-compare { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; align-items: flex-start; }
+            .toolbar-divider { width: 100%; height: 1px; }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="header-content">
             <div class="logo">书法字体制作器</div>
-            <div class="project-selector">
-                <select id="projectSelect" class="project-select">
-                    <option value="">选择项目...</option>
-                </select>
-                <button id="newProjectBtn" class="btn btn-primary">新建项目</button>
-                <button id="deleteProjectBtn" class="btn btn-danger">删除</button>
+            <div class="header-actions">
+                <a href="https://github.com/Claud-Lu/autotextdesign" target="_blank" rel="noopener noreferrer" title="GitHub">
+                    <svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                </a>
+                <button id="aboutBtn" class="btn btn-ghost">关于</button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="main">
-        <!-- Project Info -->
-        <div id="projectInfo" class="project-info" style="display: none;">
-            <div>
-                <h2 id="projectName">项目名称</h2>
-                <p style="color: var(--color-muted); margin-top: 0.5rem;">
-                    创建时间: <span id="projectDate">-</span>
-                </p>
-            </div>
-            <div class="project-stats">
-                <div class="stat-item">
-                    <div id="statSegments" class="stat-value">0</div>
-                    <div class="stat-label">待标注</div>
-                </div>
-                <div class="stat-item">
-                    <div id="statConfirmed" class="stat-value">0</div>
-                    <div class="stat-label">已确认</div>
-                </div>
-            </div>
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <span class="toolbar-label">字体名称</span>
+            <input type="text" id="fontNameInput" class="font-name-input" value="未命名字体" placeholder="输入字体名称">
+            <div class="toolbar-divider"></div>
+            <button id="importTtfBtn" class="btn btn-ghost">导入 TTF</button>
+            <div class="toolbar-divider"></div>
+            <span class="stat-chip">已收录 <strong id="glyphCount">0</strong> 字</span>
         </div>
 
-        <!-- Upload Section -->
-        <div class="upload-section" id="uploadSection" style="display: none;">
-            <div class="upload-grid">
-                <div class="upload-area" id="scanUpload">
-                    <div class="upload-icon">📄</div>
-                    <div class="upload-title">上传扫描件</div>
-                    <div class="upload-hint">拖拽图片或 PDF 到这里，或点击选择文件</div>
-                    <div class="mode-selector">
-                        <label class="mode-option">
-                            <input type="radio" name="cutMode" value="auto" checked>
-                            自动切割
-                        </label>
-                        <label class="mode-option">
-                            <input type="radio" name="cutMode" value="grid">
-                            网格切割
-                        </label>
-                    </div>
-                    <div class="grid-inputs" id="gridInputs" style="display: none;">
-                        <input type="number" id="gridCols" placeholder="列数" value="10" min="1">
-                        <input type="number" id="gridRows" placeholder="行数" value="8" min="1">
-                    </div>
-                </div>
-                <div class="upload-area" id="charUpload">
-                    <div class="upload-icon">✍️</div>
-                    <div class="upload-title">上传单字</div>
-                    <div class="upload-hint">拖拽单字图片，或点击选择文件</div>
-                    <input type="text" id="singleCharInput" placeholder="输入汉字"
-                           style="margin-top: 1rem; padding: 0.5rem; width: 150px; text-align: center;">
-                </div>
+        <!-- Upload -->
+        <div class="upload-section">
+            <div class="section-title">上传字体图片</div>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">墨</div>
+                <div class="upload-title">拖拽、点击或粘贴单字图片</div>
+                <div class="upload-hint">支持 PNG、JPG 格式</div>
             </div>
         </div>
 
-        <!-- Character Tabs -->
-        <div id="characterTabs" class="tabs" style="display: none;">
-            <button class="tab active" data-tab="pending">待标注 <span id="pendingCount">(0)</span></button>
-            <button class="tab" data-tab="confirmed">已确认 <span id="confirmedCount">(0)</span></button>
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="pending">待确认 <span id="pendingCount">(0)</span></button>
+            <button class="tab" data-tab="confirmed">已收录 <span id="confirmedCount">(0)</span></button>
         </div>
 
-        <!-- Character Grid -->
+        <!-- Grids -->
         <div id="pendingGrid" class="character-grid"></div>
         <div id="confirmedGrid" class="character-grid" style="display: none;"></div>
 
-        <!-- Empty State -->
-        <div id="emptyState" class="empty-state">
-            <div class="empty-state-icon">📁</div>
-            <div class="empty-state-text">
-                <p>请先选择或创建一个项目</p>
-                <p style="font-size: 0.875rem; margin-top: 0.5rem;">点击"新建项目"开始制作字体</p>
+        <!-- Preview -->
+        <div class="preview-section" id="previewSection">
+            <h3>字体预览</h3>
+            <div class="preview-toolbar">
+                <a id="downloadFontBtn" class="btn btn-primary" style="display: none; text-decoration: none;">下载字体</a>
+                <span id="fontStatus" class="font-status">收录文字后生成预览</span>
             </div>
-        </div>
-
-        <!-- Preview Section -->
-        <div class="preview-section" id="previewSection" style="display: none;">
-            <h3 style="margin-bottom: 1rem;">字体预览</h3>
-            <div class="preview-controls">
-                <input type="text" id="previewInput" placeholder="输入预览文字" value="书法字体制作器">
+            <textarea id="previewInput" class="preview-textarea" rows="2" placeholder="输入预览文字...">书法字体制作器</textarea>
+            <div class="preview-toolbar">
+                <span style="font-size: 0.8125rem; color: var(--ink-faint);">字号</span>
                 <select id="fontSize">
-                    <option value="24">24px</option>
-                    <option value="36">36px</option>
-                    <option value="48" selected>48px</option>
-                    <option value="72">72px</option>
-                    <option value="96">96px</option>
+                    <option value="24">24</option>
+                    <option value="36">36</option>
+                    <option value="48" selected>48</option>
+                    <option value="72">72</option>
+                    <option value="96">96</option>
                 </select>
-                <button id="generatePreviewBtn" class="btn btn-primary">生成预览</button>
             </div>
-            <div class="preview-area">
-                <div id="previewText" class="preview-text">书法字体制作器</div>
-            </div>
-        </div>
-
-        <!-- Generate Section -->
-        <div class="preview-section" id="generateSection" style="display: none;">
-            <h3 style="margin-bottom: 1rem;">生成字体</h3>
-            <div style="display: flex; gap: 1rem;">
-                <button id="generateFontBtn" class="btn btn-success">生成 TTF 字体</button>
-                <a id="downloadFontBtn" class="btn btn-primary" style="display: none;">下载字体</a>
+            <div class="preview-compare">
+                <div>
+                    <div class="preview-label">自定义字体</div>
+                    <div class="preview-area custom-font" id="previewCustom">书法字体制作器</div>
+                </div>
+                <div>
+                    <div class="preview-label">系统楷体</div>
+                    <div class="preview-area system-font" id="previewSystem">书法字体制作器</div>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- New Project Modal -->
-    <div id="newProjectModal" class="modal">
-        <div class="modal-content">
-            <h3 class="modal-title">新建项目</h3>
-            <input type="text" id="newProjectName" class="modal-input" placeholder="输入项目名称">
-            <div class="modal-actions">
-                <button id="cancelNewProject" class="btn">取消</button>
-                <button id="confirmNewProject" class="btn btn-primary">创建</button>
+    <footer class="footer">
+        <p>书法字体制作器 — 由 <strong>谷子</strong> 研发</p>
+    </footer>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <h3 class="modal-title" style="letter-spacing: 0.1em;">书法字体制作器</h3>
+            <p style="color: var(--ink-muted); font-size: 0.8125rem;">将手写字体转换为可使用的 TTF 字体文件</p>
+            <div class="about-divider"></div>
+            <div class="about-body">
+                上传手写单字图片，输入对应标准汉字确认收录，<br>自动生成可安装的 TTF 字体文件。<br>
+                支持导入已有 TTF 继续编辑。
+            </div>
+            <div style="margin-bottom: 1.25rem;">
+                <a href="https://github.com/Claud-Lu/autotextdesign" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--ink-secondary); text-decoration: none; font-size: 0.8125rem; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); transition: all 0.2s;">
+                    <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                    本项目为开源项目，欢迎 Star
+                </a>
+            </div>
+            <div class="about-credit">
+                <p>由 <span class="author">谷子</span> 研发</p>
+                <p style="margin-top: 0.25rem;">有任何意见或建议，欢迎添加微信</p>
+                <p class="about-wechat" style="margin-top: 0.375rem;">shibuyasan</p>
+            </div>
+            <div style="margin-top: 1.25rem;">
+                <button id="closeAbout" class="btn btn-primary">关闭</button>
             </div>
         </div>
     </div>
 
     <script>
-        // API Base URL
         const API_BASE = '/api';
 
-        // Current project
-        let currentProject = null;
+        // ===== State =====
+        let pending = [];        // [{id, image_base64}]
+        let glyphs = new Map();  // char → image_base64
+        let fontName = '未命名字体';
+        let fontVersion = 0;
+        let previewDebounce = null;
 
-        // DOM Elements
-        const projectSelect = document.getElementById('projectSelect');
-        const newProjectBtn = document.getElementById('newProjectBtn');
-        const deleteProjectBtn = document.getElementById('deleteProjectBtn');
-        const projectInfo = document.getElementById('projectInfo');
-        const projectName = document.getElementById('projectName');
-        const projectDate = document.getElementById('projectDate');
-        const statSegments = document.getElementById('statSegments');
-        const statConfirmed = document.getElementById('statConfirmed');
-        const uploadSection = document.getElementById('uploadSection');
-        const characterTabs = document.getElementById('characterTabs');
+        // ===== DOM =====
+        const fontNameInput = document.getElementById('fontNameInput');
+        const glyphCount = document.getElementById('glyphCount');
         const pendingGrid = document.getElementById('pendingGrid');
         const confirmedGrid = document.getElementById('confirmedGrid');
-        const emptyState = document.getElementById('emptyState');
-        const previewSection = document.getElementById('previewSection');
-        const generateSection = document.getElementById('generateSection');
-        const newProjectModal = document.getElementById('newProjectModal');
-        const newProjectName = document.getElementById('newProjectName');
-        const scanUpload = document.getElementById('scanUpload');
-        const charUpload = document.getElementById('charUpload');
+        const uploadArea = document.getElementById('uploadArea');
+        const previewInput = document.getElementById('previewInput');
+        const fontStatus = document.getElementById('fontStatus');
+        const downloadFontBtn = document.getElementById('downloadFontBtn');
 
-        // Initialize
-        async function init() {
-            await loadProjects();
-            setupEventListeners();
-        }
+        // ===== Init =====
+        setupEventListeners();
+        updateUI();
 
-        // Load Projects
-        async function loadProjects() {
-            try {
-                const response = await fetch(`${API_BASE}/projects`);
-                const projects = await response.json();
-
-                projectSelect.innerHTML = '<option value="">选择项目...</option>';
-                projects.forEach(p => {
-                    const option = document.createElement('option');
-                    option.value = p.id;
-                    option.textContent = p.name;
-                    projectSelect.appendChild(option);
-                });
-
-                if (projects.length > 0) {
-                    projectSelect.value = projects[0].id;
-                    await loadProject(projects[0].id);
-                }
-            } catch (error) {
-                console.error('Failed to load projects:', error);
-                showToast('加载项目失败', 'error');
-            }
-        }
-
-        // Load Project
-        async function loadProject(projectId) {
-            try {
-                const response = await fetch(`${API_BASE}/projects/${projectId}`);
-                const project = await response.json();
-
-                currentProject = project;
-
-                // Update UI
-                projectName.textContent = project.name;
-                projectDate.textContent = new Date(project.created_at).toLocaleDateString();
-                statSegments.textContent = project.stats.total_segments;
-                statConfirmed.textContent = project.stats.confirmed_chars;
-
-                // Show sections
-                projectInfo.style.display = 'flex';
-                uploadSection.style.display = 'block';
-                characterTabs.style.display = 'flex';
-                previewSection.style.display = 'block';
-                generateSection.style.display = 'block';
-                emptyState.style.display = 'none';
-
-                // Load characters
-                await loadCharacters();
-            } catch (error) {
-                console.error('Failed to load project:', error);
-                showToast('加载项目失败', 'error');
-            }
-        }
-
-        // Load Characters
-        async function loadCharacters() {
-            if (!currentProject) return;
-
-            try {
-                // Load pending segments
-                const segmentsResponse = await fetch(`${API_BASE}/projects/${currentProject.id}/segments`);
-                const segments = await segmentsResponse.json();
-
-                // Load confirmed characters
-                const charsResponse = await fetch(`${API_BASE}/projects/${currentProject.id}/characters`);
-                const characters = await charsResponse.json();
-
-                // Update counts
-                document.getElementById('pendingCount').textContent = `(${segments.length})`;
-                document.getElementById('confirmedCount').textContent = `(${characters.length})`;
-
-                // Render pending grid
-                renderPendingGrid(segments);
-
-                // Render confirmed grid
-                renderConfirmedGrid(characters);
-            } catch (error) {
-                console.error('Failed to load characters:', error);
-            }
-        }
-
-        // Render Pending Grid
-        function renderPendingGrid(segments) {
-            pendingGrid.innerHTML = '';
-
-            if (segments.length === 0) {
-                pendingGrid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <div class="empty-state-icon">📷</div>
-                        <div class="empty-state-text">
-                            <p>暂无待标注字</p>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">上传扫描件开始标注</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            segments.forEach(seg => {
-                const card = document.createElement('div');
-                card.className = 'char-card';
-                card.innerHTML = `
-                    <div class="char-image">
-                        <img src="${seg.image_url}" alt="Segment">
-                    </div>
-                    <div class="char-content">
-                        <div class="ocr-candidates">
-                            ${seg.ocr_candidates.slice(0, 3).map(c =>
-                                `<button class="ocr-btn" data-seg-id="${seg.id}" data-char="${c}">${c}</button>`
-                            ).join('')}
-                        </div>
-                        <input type="text" class="char-input" data-seg-id="${seg.id}"
-                               placeholder="输入汉字" maxlength="1">
-                        <div class="char-actions">
-                            <button class="btn btn-primary confirm-btn" data-seg-id="${seg.id}">确认</button>
-                            <button class="btn btn-danger delete-btn" data-seg-id="${seg.id}">删除</button>
-                        </div>
-                    </div>
-                `;
-                pendingGrid.appendChild(card);
-            });
-
-            // Add event listeners
-            pendingGrid.querySelectorAll('.ocr-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const segId = btn.dataset.segId;
-                    const char = btn.dataset.char;
-                    const input = pendingGrid.querySelector(`input[data-seg-id="${segId}"]`);
-                    input.value = char;
-                });
-            });
-
-            pendingGrid.querySelectorAll('.confirm-btn').forEach(btn => {
-                btn.addEventListener('click', () => confirmSegment(btn.dataset.segId));
-            });
-
-            pendingGrid.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', () => deleteSegment(btn.dataset.segId));
-            });
-        }
-
-        // Render Confirmed Grid
-        function renderConfirmedGrid(characters) {
-            confirmedGrid.innerHTML = '';
-
-            if (characters.length === 0) {
-                confirmedGrid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <div class="empty-state-icon">✓</div>
-                        <div class="empty-state-text">
-                            <p>暂无已确认字</p>
-                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">标注后的字会显示在这里</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            characters.forEach(char => {
-                const card = document.createElement('div');
-                card.className = 'char-card confirmed-char';
-                card.innerHTML = `
-                    <div class="char-image">
-                        <img src="${char.image_url}" alt="${char.char}">
-                    </div>
-                    <div class="confirmed-label">${char.char}</div>
-                    <div style="padding: 0.5rem;">
-                        <button class="btn btn-danger" style="width: 100%;"
-                                data-char="${char.char}">删除</button>
-                    </div>
-                `;
-                confirmedGrid.appendChild(card);
-            });
-
-            confirmedGrid.querySelectorAll('.btn-danger').forEach(btn => {
-                btn.addEventListener('click', () => deleteCharacter(btn.dataset.char));
-            });
-        }
-
-        // Confirm Segment
-        async function confirmSegment(segId) {
-            const input = pendingGrid.querySelector(`input[data-seg-id="${segId}"]`);
-            const label = input.value.trim();
-
-            if (!label) {
-                showToast('请输入汉字', 'error');
-                return;
-            }
-
-            if (!/^[\u4e00-\u9fff]$/.test(label)) {
-                showToast('请输入单个汉字', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_BASE}/projects/${currentProject.id}/segments/${segId}/confirm`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ label })
-                });
-
-                if (response.ok) {
-                    showToast(`已确认: ${label}`, 'success');
-                    await loadProject(currentProject.id);
-                    switchTab('confirmed');
-                } else {
-                    const error = await response.json();
-                    showToast(error.detail || '确认失败', 'error');
-                }
-            } catch (error) {
-                console.error('Failed to confirm segment:', error);
-                showToast('确认失败', 'error');
-            }
-        }
-
-        // Delete Segment
-        async function deleteSegment(segId) {
-            if (!confirm('确定要删除这个字吗？')) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/projects/${currentProject.id}/segments/${segId}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    showToast('已删除', 'success');
-                    await loadProject(currentProject.id);
-                }
-            } catch (error) {
-                console.error('Failed to delete segment:', error);
-                showToast('删除失败', 'error');
-            }
-        }
-
-        // Delete Character
-        async function deleteCharacter(char) {
-            if (!confirm(`确定要删除"${char}"吗？`)) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/projects/${currentProject.id}/characters/${encodeURIComponent(char)}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    showToast('已删除', 'success');
-                    await loadProject(currentProject.id);
-                }
-            } catch (error) {
-                console.error('Failed to delete character:', error);
-                showToast('删除失败', 'error');
-            }
-        }
-
-        // Upload Scan
-        async function uploadScan(file) {
-            const mode = document.querySelector('input[name="cutMode"]:checked').value;
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('mode', mode);
-
-            if (mode === 'grid') {
-                formData.append('cols', document.getElementById('gridCols').value);
-                formData.append('rows', document.getElementById('gridRows').value);
-            }
-
-            try {
-                showToast('正在切割...', 'info');
-                const response = await fetch(`${API_BASE}/projects/${currentProject.id}/scans`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    showToast(`切割完成，共 ${result.segments_count} 个字`, 'success');
-                    await loadProject(currentProject.id);
-                    switchTab('pending');
-                } else {
-                    const error = await response.json();
-                    showToast(error.detail || '上传失败', 'error');
-                }
-            } catch (error) {
-                console.error('Failed to upload scan:', error);
-                showToast('上传失败', 'error');
-            }
-        }
-
-        // Upload Single Character
-        async function uploadSingleChar(file, label) {
-            if (!label || !/^[\u4e00-\u9fff]$/.test(label)) {
-                showToast('请输入单个汉字', 'error');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('label', label);
-
-            try {
-                const response = await fetch(`${API_BASE}/projects/${currentProject.id}/characters`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    showToast(`已添加: ${label}`, 'success');
-                    document.getElementById('singleCharInput').value = '';
-                    await loadProject(currentProject.id);
-                } else {
-                    const error = await response.json();
-                    showToast(error.detail || '上传失败', 'error');
-                }
-            } catch (error) {
-                console.error('Failed to upload character:', error);
-                showToast('上传失败', 'error');
-            }
-        }
-
-        // Switch Tab
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-
-            if (tab === 'pending') {
-                pendingGrid.style.display = 'grid';
-                confirmedGrid.style.display = 'none';
-            } else {
-                pendingGrid.style.display = 'none';
-                confirmedGrid.style.display = 'grid';
-            }
-        }
-
-        // Generate Font
-        async function generateFont() {
-            const btn = document.getElementById('generateFontBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> 生成中...';
-
-            try {
-                const response = await fetch(`${API_BASE}/projects/${currentProject.id}/generate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    showToast(`字体生成成功！共 ${result.glyph_count} 个字`, 'success');
-
-                    // Show download button
-                    const downloadBtn = document.getElementById('downloadFontBtn');
-                    downloadBtn.href = `${API_BASE}/projects/${currentProject.id}/download`;
-                    downloadBtn.style.display = 'inline-block';
-                } else {
-                    const error = await response.json();
-                    showToast(error.detail || '生成失败', 'error');
-                }
-            } catch (error) {
-                console.error('Failed to generate font:', error);
-                showToast('生成失败', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '生成 TTF 字体';
-            }
-        }
-
-        // Show Toast
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-
-            if (type === 'success') toast.style.background = 'var(--color-success)';
-            if (type === 'error') toast.style.background = 'var(--color-error)';
-
-            document.body.appendChild(toast);
-
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // Setup Event Listeners
+        // ===== Event Listeners =====
         function setupEventListeners() {
-            // Project selection
-            projectSelect.addEventListener('change', () => {
-                if (projectSelect.value) {
-                    loadProject(projectSelect.value);
-                } else {
-                    currentProject = null;
-                    projectInfo.style.display = 'none';
-                    uploadSection.style.display = 'none';
-                    characterTabs.style.display = 'none';
-                    pendingGrid.innerHTML = '';
-                    confirmedGrid.innerHTML = '';
-                    previewSection.style.display = 'none';
-                    generateSection.style.display = 'none';
-                    emptyState.style.display = 'block';
-                }
+            // Font name
+            fontNameInput.addEventListener('input', () => {
+                fontName = fontNameInput.value.trim() || '未命名字体';
             });
 
-            // New project
-            newProjectBtn.addEventListener('click', () => {
-                newProjectModal.classList.add('show');
-                newProjectName.focus();
+            // Import TTF
+            document.getElementById('importTtfBtn').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.ttf';
+                input.onchange = (e) => {
+                    if (e.target.files[0]) importTTF(e.target.files[0]);
+                };
+                input.click();
             });
 
-            document.getElementById('cancelNewProject').addEventListener('click', () => {
-                newProjectModal.classList.remove('show');
-                newProjectName.value = '';
+            // About
+            document.getElementById('aboutBtn').addEventListener('click', () => {
+                document.getElementById('aboutModal').classList.add('show');
+            });
+            document.getElementById('closeAbout').addEventListener('click', () => {
+                document.getElementById('aboutModal').classList.remove('show');
             });
 
-            document.getElementById('confirmNewProject').addEventListener('click', async () => {
-                const name = newProjectName.value.trim();
-                if (!name) {
-                    showToast('请输入项目名称', 'error');
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`${API_BASE}/projects`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name })
-                    });
-
-                    if (response.ok) {
-                        const project = await response.json();
-                        showToast('项目创建成功', 'success');
-                        newProjectModal.classList.remove('show');
-                        newProjectName.value = '';
-                        await loadProjects();
-                        projectSelect.value = project.id;
-                        await loadProject(project.id);
-                    }
-                } catch (error) {
-                    console.error('Failed to create project:', error);
-                    showToast('创建项目失败', 'error');
-                }
-            });
-
-            // Delete project
-            deleteProjectBtn.addEventListener('click', async () => {
-                if (!currentProject) return;
-                if (!confirm(`确定要删除项目"${currentProject.name}"吗？此操作不可恢复。`)) return;
-
-                try {
-                    const response = await fetch(`${API_BASE}/projects/${currentProject.id}`, {
-                        method: 'DELETE'
-                    });
-
-                    if (response.ok) {
-                        showToast('项目已删除', 'success');
-                        await loadProjects();
-                    }
-                } catch (error) {
-                    console.error('Failed to delete project:', error);
-                    showToast('删除项目失败', 'error');
-                }
-            });
-
-            // Tab switching
+            // Tabs
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', () => switchTab(tab.dataset.tab));
             });
 
-            // Mode selector
-            document.querySelectorAll('input[name="cutMode"]').forEach(radio => {
-                radio.addEventListener('change', () => {
-                    document.getElementById('gridInputs').style.display =
-                        radio.value === 'grid' ? 'flex' : 'none';
-                });
-            });
-
-            // Scan upload
-            scanUpload.addEventListener('dragover', (e) => {
+            // Upload
+            uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+            uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
+            uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
-                scanUpload.classList.add('dragover');
-            });
-
-            scanUpload.addEventListener('dragleave', () => {
-                scanUpload.classList.remove('dragover');
-            });
-
-            scanUpload.addEventListener('drop', (e) => {
-                e.preventDefault();
-                scanUpload.classList.remove('dragover');
+                uploadArea.classList.remove('dragover');
                 const file = e.dataTransfer.files[0];
-                if (file) uploadScan(file);
+                if (file && file.type.startsWith('image/')) uploadImage(file);
             });
-
-            scanUpload.addEventListener('click', (e) => {
-                if (e.target === scanUpload || scanUpload.contains(e.target)) {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*,.pdf';
-                    input.onchange = (e) => {
-                        if (e.target.files[0]) uploadScan(e.target.files[0]);
-                    };
-                    input.click();
+            uploadArea.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => { if (e.target.files[0]) uploadImage(e.target.files[0]); };
+                input.click();
+            });
+            document.addEventListener('paste', (e) => {
+                const items = e.clipboardData?.items;
+                if (!items) return;
+                for (const item of items) {
+                    if (item.type.startsWith('image/')) {
+                        e.preventDefault();
+                        uploadImage(item.getAsFile());
+                        return;
+                    }
                 }
             });
 
-            // Character upload
-            charUpload.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                charUpload.classList.add('dragover');
+            // Preview
+            previewInput.addEventListener('input', () => {
+                updatePreviewText();
+                debouncedGeneratePreview();
+            });
+            document.getElementById('fontSize').addEventListener('change', () => {
+                updatePreviewText();
             });
 
-            charUpload.addEventListener('dragleave', () => {
-                charUpload.classList.remove('dragover');
-            });
-
-            charUpload.addEventListener('drop', (e) => {
-                e.preventDefault();
-                charUpload.classList.remove('dragover');
-                const file = e.dataTransfer.files[0];
-                const label = document.getElementById('singleCharInput').value;
-                if (file) uploadSingleChar(file, label);
-            });
-
-            charUpload.addEventListener('click', (e) => {
-                if (e.target === charUpload || charUpload.contains(e.target)) {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = (e) => {
-                        const label = document.getElementById('singleCharInput').value;
-                        if (e.target.files[0]) uploadSingleChar(e.target.files[0], label);
-                    };
-                    input.click();
-                }
-            });
-
-            // Font size
-            document.getElementById('fontSize').addEventListener('change', (e) => {
-                document.getElementById('previewText').style.fontSize = e.target.value + 'px';
-            });
-
-            // Generate font
-            document.getElementById('generateFontBtn').addEventListener('click', generateFont);
+            // Download
+            downloadFontBtn.addEventListener('click', downloadFont);
 
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
-                if (e.target.tagName === 'INPUT') return;
-
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
                 if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                     const tabs = document.querySelectorAll('.tab');
                     const activeIndex = Array.from(tabs).findIndex(t => t.classList.contains('active'));
@@ -1252,8 +649,292 @@
             });
         }
 
-        // Initialize app
-        init();
+        // ===== Import TTF =====
+        async function importTTF(file) {
+            showToast('正在解析字体...', 'info');
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_BASE}/import-ttf`, { method: 'POST', body: formData });
+                if (!response.ok) {
+                    const error = await response.json();
+                    showToast(error.detail || '导入失败', 'error');
+                    return;
+                }
+                const result = await response.json();
+
+                // Add imported glyphs to state
+                for (const g of result.glyphs) {
+                    glyphs.set(g.char, g.image_base64);
+                }
+
+                // Update font name if user hasn't changed it
+                if (fontNameInput.value === '未命名字体' || !fontNameInput.value.trim()) {
+                    fontName = result.font_name;
+                    fontNameInput.value = fontName;
+                }
+
+                showToast(`导入成功，共 ${result.glyphs.length} 个字`, 'success');
+                updateUI();
+                switchTab('confirmed');
+                await generatePreview();
+            } catch (error) {
+                console.error('Import failed:', error);
+                showToast('导入失败', 'error');
+            }
+        }
+
+        // ===== Upload Image =====
+        async function uploadImage(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                showToast('正在处理...', 'info');
+                const response = await fetch(`${API_BASE}/preprocess`, { method: 'POST', body: formData });
+                if (!response.ok) {
+                    const error = await response.json();
+                    showToast(error.detail || '处理失败', 'error');
+                    return;
+                }
+                const result = await response.json();
+
+                pending.push({
+                    id: `p_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                    image_base64: result.image_base64,
+                });
+
+                showToast('已添加到待确认', 'success');
+                updateUI();
+                switchTab('pending');
+            } catch (error) {
+                console.error('Upload failed:', error);
+                showToast('上传失败', 'error');
+            }
+        }
+
+        // ===== Confirm =====
+        function confirmPending(id) {
+            const input = document.querySelector(`input[data-id="${id}"]`);
+            const label = input.value.trim();
+            if (!label) { showToast('请输入标准字', 'error'); return; }
+            if (!/^[\u4e00-\u9fff]$/.test(label)) { showToast('请输入单个汉字', 'error'); return; }
+
+            const item = pending.find(p => p.id === id);
+            if (!item) return;
+
+            // If char already exists, overwrite
+            glyphs.set(label, item.image_base64);
+            pending = pending.filter(p => p.id !== id);
+
+            showToast(`已收录: ${label}`, 'success');
+            updateUI();
+            switchTab('confirmed');
+            debouncedGeneratePreview();
+        }
+
+        // ===== Delete =====
+        function deletePending(id) {
+            pending = pending.filter(p => p.id !== id);
+            updateUI();
+        }
+
+        function deleteConfirmed(char) {
+            glyphs.delete(char);
+            updateUI();
+            debouncedGeneratePreview();
+        }
+
+        // ===== Generate Preview =====
+        let previewGenerating = false;
+
+        function debouncedGeneratePreview() {
+            clearTimeout(previewDebounce);
+            previewDebounce = setTimeout(generatePreview, 500);
+        }
+
+        async function generatePreview() {
+            if (glyphs.size === 0 || previewGenerating) return;
+            previewGenerating = true;
+
+            try {
+                const glyphList = [];
+                for (const [char, img_b64] of glyphs) {
+                    glyphList.push({ char, image_base64: img_b64 });
+                }
+
+                const response = await fetch(`${API_BASE}/preview`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ glyphs: glyphList, font_name: fontName }),
+                });
+
+                if (!response.ok) return;
+
+                const blob = await response.blob();
+                fontVersion++;
+                const url = URL.createObjectURL(blob);
+
+                const old = document.getElementById('dynamicFont');
+                if (old) old.remove();
+
+                const style = document.createElement('style');
+                style.id = 'dynamicFont';
+                style.textContent = `@font-face { font-family: 'PreviewFont'; src: url('${url}') format('truetype'); }`;
+                document.head.appendChild(style);
+
+                updatePreviewText();
+                downloadFontBtn.style.display = 'inline-block';
+                fontStatus.textContent = `已收录 ${glyphs.size} 个字`;
+            } catch (error) {
+                console.error('Preview failed:', error);
+            } finally {
+                previewGenerating = false;
+            }
+        }
+
+        // ===== Download =====
+        async function downloadFont(e) {
+            e.preventDefault();
+            if (glyphs.size === 0) { showToast('没有已收录的字', 'error'); return; }
+
+            showToast('正在生成字体...', 'info');
+            const glyphList = [];
+            for (const [char, img_b64] of glyphs) {
+                glyphList.push({ char, image_base64: img_b64 });
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ glyphs: glyphList, font_name: fontName }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    showToast(error.detail || '生成失败', 'error');
+                    return;
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${fontName}.ttf`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('字体下载成功', 'success');
+            } catch (error) {
+                console.error('Download failed:', error);
+                showToast('下载失败', 'error');
+            }
+        }
+
+        // ===== UI Update =====
+        function updateUI() {
+            glyphCount.textContent = glyphs.size;
+            document.getElementById('pendingCount').textContent = `(${pending.length})`;
+            document.getElementById('confirmedCount').textContent = `(${glyphs.size})`;
+
+            if (glyphs.size === 0) {
+                downloadFontBtn.style.display = 'none';
+                fontStatus.textContent = '收录文字后生成预览';
+            }
+
+            renderPendingGrid();
+            renderConfirmedGrid();
+        }
+
+        function renderPendingGrid() {
+            pendingGrid.innerHTML = '';
+            if (pending.length === 0) {
+                pendingGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">砚</div>
+                        <div class="empty-state-text"><p>暂无待确认字</p><p>上传字体图片开始收录</p></div>
+                    </div>`;
+                return;
+            }
+
+            pending.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'char-card';
+                card.innerHTML = `
+                    <div class="char-image"><img src="data:image/png;base64,${item.image_base64}" alt="Pending"></div>
+                    <div class="char-content">
+                        <input type="text" class="char-input" data-id="${item.id}" placeholder="输入标准字" maxlength="1">
+                        <div class="char-actions">
+                            <button class="btn btn-success confirm-btn" data-id="${item.id}">确认</button>
+                            <button class="btn btn-danger-outline delete-btn" data-id="${item.id}">删除</button>
+                        </div>
+                    </div>`;
+                pendingGrid.appendChild(card);
+            });
+
+            pendingGrid.querySelectorAll('.confirm-btn').forEach(btn => {
+                btn.addEventListener('click', () => confirmPending(btn.dataset.id));
+            });
+            pendingGrid.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', () => deletePending(btn.dataset.id));
+            });
+        }
+
+        function renderConfirmedGrid() {
+            confirmedGrid.innerHTML = '';
+            if (glyphs.size === 0) {
+                confirmedGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">藏</div>
+                        <div class="empty-state-text"><p>暂无已收录字</p><p>确认后的字显示在这里</p></div>
+                    </div>`;
+                return;
+            }
+
+            const sorted = [...glyphs.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+            sorted.forEach(([char, img_b64]) => {
+                const card = document.createElement('div');
+                card.className = 'char-card confirmed-char';
+                card.innerHTML = `
+                    <div class="char-image"><img src="data:image/png;base64,${img_b64}" alt="${char}"></div>
+                    <div class="confirmed-label">${char}</div>
+                    <div class="confirmed-actions">
+                        <button class="btn btn-danger-outline" data-char="${char}">删除</button>
+                    </div>`;
+                confirmedGrid.appendChild(card);
+            });
+
+            confirmedGrid.querySelectorAll('.btn-danger-outline').forEach(btn => {
+                btn.addEventListener('click', () => deleteConfirmed(btn.dataset.char));
+            });
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            pendingGrid.style.display = tab === 'pending' ? 'grid' : 'none';
+            confirmedGrid.style.display = tab === 'confirmed' ? 'grid' : 'none';
+        }
+
+        function updatePreviewText() {
+            const text = previewInput.value || '请输入预览文字';
+            const size = document.getElementById('fontSize').value + 'px';
+            const customEl = document.getElementById('previewCustom');
+            const systemEl = document.getElementById('previewSystem');
+            customEl.style.fontSize = size;
+            systemEl.style.fontSize = size;
+            customEl.textContent = text;
+            systemEl.textContent = text;
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
     </script>
 </body>
 </html>

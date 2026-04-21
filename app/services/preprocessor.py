@@ -7,7 +7,7 @@ from scipy import ndimage as ndi
 from skimage import filters, morphology
 from pathlib import Path
 
-from app.config import GLYPH_SIZE, PROJECTS_DIR
+from app.config import GLYPH_SIZE
 
 
 def preprocess_single_char(image_bytes: bytes) -> Image.Image:
@@ -88,32 +88,3 @@ def preprocess_single_char(image_bytes: bytes) -> Image.Image:
     image = ImageOps.invert(image)
 
     return image
-
-
-def save_processed_char(
-    image: Image.Image, project_id: str, unicode_char: str
-) -> str:
-    """
-    保存处理后的字符图片
-
-    Args:
-        image: PIL Image
-        project_id: 项目ID
-        unicode_char: Unicode 字符
-
-    Returns:
-        str: 保存的相对路径
-    """
-    # 转换为 Unicode 十六进制
-    unicode_hex = f"{ord(unicode_char):04X}"
-
-    # 确保目录存在
-    chars_dir = PROJECTS_DIR / project_id / "chars"
-    chars_dir.mkdir(parents=True, exist_ok=True)
-
-    # 保存
-    filename = f"{unicode_hex}.png"
-    filepath = chars_dir / filename
-    image.save(filepath, "PNG")
-
-    return f"/api/projects/{project_id}/chars/{unicode_hex}.png"

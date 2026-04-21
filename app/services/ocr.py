@@ -55,45 +55,54 @@ def get_ocr_hints(image_bytes: bytes, lang: str = "chi_sim") -> dict:
 
         image = ImageOps.autocontrast(image, cutoff=1)
 
-        # 获取 OCR 数据
-        data = pytesseract.image_to_data(
-            image, lang=lang, output_type=pytesseract.Output.DICT
-        )
-
-        # 提取候选字（取 confidence 最高的前3个）
+        # 先尝试单字模式（--psm 10）
         candidates = []
-        confidences = []
-        texts = []
-
-        for i, text in enumerate(data["text"]):
-            conf = int(data["conf"][i])
-            if conf > 0 and text.strip():
-                texts.append((text, conf))
-
-        # 按置信度排序
-        texts.sort(key=lambda x: x[1], reverse=True)
-
-        # 去重并取前3
-        seen = set()
-        for text, conf in texts:
-            if text not in seen and len(text) == 1:
+        try:
+            text = pytesseract.image_to_string(
+                image, lang=lang, config="--psm 10"
+            ).strip()
+            if text and len(text) == 1:
                 candidates.append(text)
-                seen.add(text)
-                if len(candidates) >= 3:
-                    break
+        except Exception:
+            pass
+
+        # 再用 image_to_data 获取更多候选
+        try:
+            data = pytesseract.image_to_data(
+                image, lang=lang, output_type=pytesseract.Output.DICT
+            )
+
+            texts = []
+            for i, txt in enumerate(data["text"]):
+                conf = int(data["conf"][i])
+                if conf > 0 and txt.strip():
+                    texts.append((txt.strip(), conf))
+
+            texts.sort(key=lambda x: x[1], reverse=True)
+
+            seen = set(candidates)
+            for txt, _ in texts:
+                # 取每个候选字的第一个字符
+                ch = txt[0] if txt else ""
+                if ch and 0x4E00 <= ord(ch) <= 0x9FFF and ch not in seen:
+                    candidates.append(ch)
+                    seen.add(ch)
+                    if len(candidates) >= 3:
+                        break
+        except Exception:
+            pass
 
         # 生成形近字
         similar = []
-        for char in candidates[:2]:  # 只对前2个候选字生成形近字
+        for char in candidates[:2]:
             if char in SIMILAR_CHARS_MAP:
                 similar.extend(SIMILAR_CHARS_MAP[char])
 
-        # 去重
         similar = list(set(similar) - set(candidates))
 
         return {
             "candidates": candidates,
-            "similar": similar[:5],  # 最多返回5个形近字
+            "similar": similar[:5],
         }
 
     except Exception as e:

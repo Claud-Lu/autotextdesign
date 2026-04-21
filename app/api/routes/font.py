@@ -1,41 +1,52 @@
-"""字体生成 API 路由"""
-import datetime
-from pathlib import Path
-from typing import Optional
+"""字体导入与生成 API 路由"""
+from urllib.parse import quote
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, File, HTTPException, UploadFile, status
+from fastapi.responses import Response
 
-from app.api.models import FontGenerateRequest
-from app.config import PROJECTS_DIR
-from app.services.font_builder import build_font, build_preview_font
-from app.services.project_service import get_project, update_meta
+from app.api.models import GenerateRequest, GlyphInput
+from app.services.font_builder import build_font_from_data
+from app.services.font_importer import import_ttf
 
-router = APIRouter(prefix="/api/projects/{project_id}", tags=["font"])
+router = APIRouter(prefix="/api", tags=["font"])
+
+
+@router.post("/import-ttf")
+async def import_ttf_file(file: UploadFile = File(...)) -> dict:
+    """导入已有 TTF 字体，提取字形返回"""
+    if not file.filename or not file.filename.lower().endswith(".ttf"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="请上传 TTF 字体文件",
+        )
+
+    ttf_bytes = await file.read()
+
+    try:
+        result = import_ttf(ttf_bytes)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"TTF 解析失败: {str(e)}",
+        )
+
+    return result
 
 
 @router.post("/generate")
-async def generate_font(project_id: str, data: FontGenerateRequest) -> dict:
-    """生成字体文件"""
-    # 验证项目存在
-    project = get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"项目 {project_id} 不存在",
-        )
-
-    # 检查是否有字符
-    confirmed_chars = project.get("confirmed_chars", [])
-    if not confirmed_chars:
+async def generate_font(data: GenerateRequest) -> Response:
+    """从图片数据生成 TTF 字体"""
+    if not data.glyphs:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="项目没有任何已确认的字符",
+            detail="没有可用的字形数据",
         )
 
-    # 生成字体
-    font_name = data.font_name or project["name"]
     try:
-        font_path = build_font(project_id, font_name)
+        font_bytes = build_font_from_data(
+            [g.model_dump() for g in data.glyphs],
+            data.font_name,
+        )
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -47,90 +58,40 @@ async def generate_font(project_id: str, data: FontGenerateRequest) -> dict:
             detail=f"字体生成失败: {str(e)}",
         )
 
-    # 更新项目元数据
-    meta = get_project(project_id)
-    meta.setdefault("generated_fonts", [])
-    meta["generated_fonts"].append(
-        {
-            "font_name": font_name,
-            "font_path": font_path,
-            "glyph_count": len(confirmed_chars),
-            "generated_at": datetime.datetime.now().isoformat(),
-        }
-    )
-
-    update_meta(project_id, {"generated_fonts": meta["generated_fonts"]})
-
-    return {
-        "status": "ok",
-        "font_path": font_path,
-        "font_name": font_name,
-        "glyph_count": len(confirmed_chars),
-    }
-
-
-@router.get("/download")
-async def download_font(project_id: str):
-    """下载字体文件"""
-    from fastapi.responses import FileResponse
-
-    project = get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"项目 {project_id} 不存在",
-        )
-
-    # 获取最新生成的字体
-    generated_fonts = project.get("generated_fonts", [])
-    if not generated_fonts:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="项目还没有生成任何字体",
-        )
-
-    font_path = generated_fonts[-1]["font_path"]
-
-    if not Path(font_path).exists():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="字体文件不存在",
-        )
-
-    return FileResponse(
-        font_path,
+    return Response(
+        content=font_bytes,
         media_type="font/ttf",
-        filename=f"{Path(font_path).name}",
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quote(data.font_name)}.ttf"},
     )
 
 
-@router.get("/preview-font")
-async def get_preview_font(project_id: str):
-    """获取预览字体"""
-    from fastapi.responses import Response
-
-    project = get_project(project_id)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"项目 {project_id} 不存在",
-        )
-
-    # 检查是否有字符
-    confirmed_chars = project.get("confirmed_chars", [])
-    if not confirmed_chars:
+@router.post("/preview")
+async def preview_font(data: GenerateRequest) -> Response:
+    """生成预览字体（浏览器端加载用）"""
+    if not data.glyphs:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="项目没有任何已确认的字符",
+            detail="没有可用的字形数据",
         )
 
-    # 生成预览字体
     try:
-        font_bytes = build_preview_font(project_id)
+        font_bytes = build_font_from_data(
+            [g.model_dump() for g in data.glyphs],
+            data.font_name,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"预览字体生成失败: {str(e)}",
+            detail=f"预览生成失败: {str(e)}",
         )
 
-    return Response(content=font_bytes, media_type="font/ttf", headers={"Cache-Control": "max-age=3600"})
+    return Response(
+        content=font_bytes,
+        media_type="font/ttf",
+        headers={"Cache-Control": "no-cache"},
+    )
