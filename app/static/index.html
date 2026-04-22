@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>书法字体制作器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -51,7 +54,7 @@
         }
 
         .header-content {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -62,9 +65,10 @@
         }
 
         .logo {
-            font-size: 1.25rem;
-            font-weight: 600;
-            letter-spacing: 0.15em;
+            font-family: "Zhi Mang Xing", "KaiTi", "STKaiti", cursive;
+            font-size: 1.875rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
         }
 
         .header-actions {
@@ -102,10 +106,131 @@
         .btn-success:hover { background: #4A7A49; }
 
         .main {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
             padding: 2rem;
+            display: flex;
+            gap: 1.75rem;
+            align-items: flex-start;
         }
+
+        .content-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar {
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 80px;
+            max-height: calc(100vh - 100px);
+            background: var(--card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .sidebar-header {
+            flex-shrink: 0;
+        }
+
+        .sidebar-body {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+            margin-top: 0.5rem;
+        }
+
+        .sidebar-search {
+            margin-bottom: 0;
+        }
+        .sidebar-search input {
+            width: 100%;
+            padding: 0.4375rem 0.625rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.8125rem;
+            font-family: inherit;
+            background: var(--card-alt);
+            color: var(--ink);
+            transition: border-color 0.2s;
+        }
+        .sidebar-search input:focus { outline: none; border-color: var(--cinnabar); }
+        .sidebar-search input::placeholder { color: var(--ink-faint); }
+
+        .sidebar .tabs {
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar .tab {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8125rem;
+        }
+
+        .sidebar .character-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.875rem;
+        }
+
+        .sidebar .char-card {
+            border-radius: var(--radius-sm);
+        }
+
+        .sidebar .char-image {
+            padding: 0.75rem;
+        }
+
+        .sidebar .char-content {
+            padding: 0.625rem;
+        }
+
+        .sidebar .char-input {
+            font-size: 0.875rem;
+            padding: 0.375rem;
+            margin-bottom: 0.375rem;
+        }
+
+        .sidebar .char-actions .btn {
+            font-size: 0.75rem;
+            padding: 0.375rem 0;
+        }
+
+        .sidebar .confirmed-label {
+            font-size: 1.25rem;
+            padding: 0.375rem 0;
+        }
+
+        .sidebar .confirmed-actions {
+            padding: 0 0.625rem 0.625rem;
+        }
+
+        .sidebar .empty-state {
+            padding: 1.5rem 0.5rem;
+        }
+
+        .sidebar .empty-state-icon {
+            font-size: 2rem;
+        }
+
+        .notice-bar {
+            background: var(--gold-light);
+            border: 1px solid rgba(201, 169, 110, 0.25);
+            border-radius: var(--radius);
+            padding: 0.875rem 1.25rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.8125rem;
+            line-height: 1.7;
+            color: var(--ink-secondary);
+        }
+        .notice-bar p { margin: 0; }
+        .notice-bar p + p { margin-top: 0.375rem; }
+        .notice-bar strong { color: var(--cinnabar); font-weight: 600; }
 
         /* Toolbar */
         .toolbar {
@@ -426,11 +551,17 @@
 
         @media (max-width: 768px) {
             .header-content { flex-direction: column; gap: 0.75rem; padding: 0.75rem 1.25rem; }
-            .main { padding: 1.25rem; }
+            .main { padding: 1.25rem; flex-direction: column; }
+            .sidebar { width: 100%; position: static; max-height: none; overflow: visible; }
+            .sidebar-body { overflow-y: visible; }
+            .sidebar .character-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
             .character-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; }
             .preview-compare { grid-template-columns: 1fr; }
             .toolbar { flex-direction: column; align-items: flex-start; }
             .toolbar-divider { width: 100%; height: 1px; }
+        }
+        @media (max-width: 640px) {
+            .sidebar .character-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -448,65 +579,86 @@
     </header>
 
     <main class="main">
-        <!-- Toolbar -->
-        <div class="toolbar">
-            <span class="toolbar-label">字体名称</span>
-            <input type="text" id="fontNameInput" class="font-name-input" value="未命名字体" placeholder="输入字体名称">
-            <div class="toolbar-divider"></div>
-            <button id="importTtfBtn" class="btn btn-ghost">导入 TTF</button>
-            <div class="toolbar-divider"></div>
-            <span class="stat-chip">已收录 <strong id="glyphCount">0</strong> 字</span>
-        </div>
+        <!-- Left Column -->
+        <div class="content-area">
+            <!-- Notice -->
+            <div class="notice-bar">
+                <p>📌 如需继续修改已有字体，请优先<strong>导入 TTF 文件</strong>，再进行上传或收录。</p>
+                <p>⚠️ 本网站不存储字体数据，修改后请<strong>及时下载字体保存</strong>；后续修改可重新导入继续制作。</p>
+            </div>
 
-        <!-- Upload -->
-        <div class="upload-section">
-            <div class="section-title">上传字体图片</div>
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">墨</div>
-                <div class="upload-title">拖拽、点击或粘贴单字图片</div>
-                <div class="upload-hint">支持 PNG、JPG 格式</div>
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <span class="toolbar-label">字体名称</span>
+                <input type="text" id="fontNameInput" class="font-name-input" value="未命名字体" placeholder="输入字体名称">
+                <div class="toolbar-divider"></div>
+                <button id="importTtfBtn" class="btn btn-ghost">导入 TTF</button>
+                <div class="toolbar-divider"></div>
+                <span class="stat-chip">已收录 <strong id="glyphCount">0</strong> 字</span>
             </div>
-        </div>
 
-        <!-- Preview -->
-        <div class="preview-section" id="previewSection">
-            <h3>字体预览</h3>
-            <div class="preview-toolbar">
-                <a id="downloadFontBtn" class="btn btn-primary" style="display: none; text-decoration: none;">下载字体</a>
-                <span id="fontStatus" class="font-status">收录文字后生成预览</span>
-            </div>
-            <textarea id="previewInput" class="preview-textarea" rows="2" placeholder="输入预览文字...">书法字体制作器</textarea>
-            <div class="preview-toolbar">
-                <span style="font-size: 0.8125rem; color: var(--ink-faint);">字号</span>
-                <select id="fontSize">
-                    <option value="24">24</option>
-                    <option value="36">36</option>
-                    <option value="48" selected>48</option>
-                    <option value="72">72</option>
-                    <option value="96">96</option>
-                </select>
-            </div>
-            <div class="preview-compare">
-                <div>
-                    <div class="preview-label">自定义字体</div>
-                    <div class="preview-area custom-font" id="previewCustom">书法字体制作器</div>
-                </div>
-                <div>
-                    <div class="preview-label">系统楷体</div>
-                    <div class="preview-area system-font" id="previewSystem">书法字体制作器</div>
+            <!-- Upload -->
+            <div class="upload-section">
+                <div class="section-title">上传字体图片</div>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">墨</div>
+                    <div class="upload-title">拖拽、点击或粘贴单字图片</div>
+                    <div class="upload-hint">支持 PNG、JPG 格式</div>
                 </div>
             </div>
+
+            <!-- Preview -->
+            <div class="preview-section" id="previewSection">
+                <h3>字体预览</h3>
+                <div class="preview-toolbar">
+                    <a id="downloadFontBtn" class="btn btn-primary" style="display: none; text-decoration: none;">下载字体</a>
+                    <span id="fontStatus" class="font-status">收录文字后生成预览</span>
+                </div>
+                <textarea id="previewInput" class="preview-textarea" rows="2" placeholder="输入预览文字...">书法字体制作器</textarea>
+                <div class="preview-toolbar">
+                    <span style="font-size: 0.8125rem; color: var(--ink-faint);">字号</span>
+                    <select id="fontSize">
+                        <option value="24">24</option>
+                        <option value="36">36</option>
+                        <option value="48" selected>48</option>
+                        <option value="72">72</option>
+                        <option value="96">96</option>
+                    </select>
+                </div>
+                <div class="preview-compare">
+                    <div>
+                        <div class="preview-label">自定义字体</div>
+                        <div class="preview-area custom-font" id="previewCustom">书法字体制作器</div>
+                    </div>
+                    <div>
+                        <div class="preview-label">系统楷体</div>
+                        <div class="preview-area system-font" id="previewSystem">书法字体制作器</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab active" data-tab="pending">待确认 <span id="pendingCount">(0)</span></button>
-            <button class="tab" data-tab="confirmed">已收录 <span id="confirmedCount">(0)</span></button>
-        </div>
+        <!-- Right Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" data-tab="pending">待确认 <span id="pendingCount">(0)</span></button>
+                    <button class="tab" data-tab="confirmed">已收录 <span id="confirmedCount">(0)</span></button>
+                </div>
 
-        <!-- Grids -->
-        <div id="pendingGrid" class="character-grid"></div>
-        <div id="confirmedGrid" class="character-grid" style="display: none;"></div>
+                <!-- Search -->
+                <div class="sidebar-search">
+                    <input type="text" id="charSearch" placeholder="搜索文字...">
+                </div>
+            </div>
+
+            <!-- Grids -->
+            <div class="sidebar-body">
+                <div id="pendingGrid" class="character-grid"></div>
+                <div id="confirmedGrid" class="character-grid" style="display: none;"></div>
+            </div>
+        </div>
     </main>
 
     <footer class="footer">
@@ -634,6 +786,9 @@
 
             // Download
             downloadFontBtn.addEventListener('click', downloadFont);
+
+            // Sidebar search
+            document.getElementById('charSearch').addEventListener('input', filterSidebar);
 
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
@@ -915,6 +1070,30 @@
             document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
             pendingGrid.style.display = tab === 'pending' ? 'grid' : 'none';
             confirmedGrid.style.display = tab === 'confirmed' ? 'grid' : 'none';
+            filterSidebar();
+        }
+
+        function filterSidebar() {
+            const query = document.getElementById('charSearch').value.trim();
+            const activeTab = document.querySelector('.tab.active').dataset.tab;
+            const grid = activeTab === 'pending' ? pendingGrid : confirmedGrid;
+            const cards = grid.querySelectorAll('.char-card');
+
+            if (!query) {
+                cards.forEach(card => card.style.display = '');
+                return;
+            }
+
+            cards.forEach(card => {
+                const label = activeTab === 'pending'
+                    ? card.querySelector('.char-input')?.value
+                    : card.querySelector('.confirmed-label')?.textContent;
+                if (label && label.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         function updatePreviewText() {
