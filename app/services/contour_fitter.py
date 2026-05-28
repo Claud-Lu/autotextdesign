@@ -6,7 +6,8 @@ from PIL import Image
 from scipy import ndimage as ndi
 from skimage import measure, filters
 
-from app.config import BLUR_SIGMA, CONTOUR_TOLERANCE, UNITS_PER_EM
+from app.config import ASCENT, BLUR_SIGMA, CONTOUR_TOLERANCE, DESCENT, UNITS_PER_EM
+from app.config import CONTOUR_SMOOTH_ITERS
 
 
 def smooth_contour(binary_arr: np.ndarray, sigma: float = BLUR_SIGMA) -> np.ndarray:
@@ -72,7 +73,49 @@ def simplify_polygon(points: np.ndarray, tolerance: float = CONTOUR_TOLERANCE) -
     """
     from skimage.measure import approximate_polygon
 
-    return approximate_polygon(points, tolerance)
+    poly = approximate_polygon(points, tolerance)
+    # ensure closed polygon (first != last in skimage result sometimes)
+    if poly.shape[0] > 0 and not np.allclose(poly[0], poly[-1]):
+        poly = np.vstack([poly, poly[0]])
+    return poly
+
+
+def chaikin_smooth(points: np.ndarray, iterations: int = CONTOUR_SMOOTH_ITERS) -> np.ndarray:
+    """
+    Chaikin 曲线细分平滑（针对闭合多边形）
+
+    Args:
+        points: (N,2) 点序列，期望首尾相连
+        iterations: 迭代次数
+
+    Returns:
+        平滑后的点序列 (M,2)
+    """
+    if points.shape[0] < 3:
+        return points
+
+    # work on float copy
+    pts = points.astype(float)
+
+    # ensure closed
+    if not np.allclose(pts[0], pts[-1]):
+        pts = np.vstack([pts, pts[0]])
+
+    for _ in range(max(0, int(iterations))):
+        new_pts = []
+        n = pts.shape[0]
+        for i in range(n - 1):
+            p0 = pts[i]
+            p1 = pts[i + 1]
+            q = 0.75 * p0 + 0.25 * p1
+            r = 0.25 * p0 + 0.75 * p1
+            new_pts.append(q)
+            new_pts.append(r)
+        # close
+        new_pts.append(new_pts[0])
+        pts = np.vstack(new_pts)
+
+    return pts
 
 
 def contours_to_glyph(
@@ -98,20 +141,63 @@ def contours_to_glyph(
         if not outer_contours:
             return None
 
-        # 简化轮廓
-        outer_simplified = [simplify_polygon(c) for c in outer_contours]
-        inner_simplified = [simplify_polygon(c) for c in inner_contours]
+        # 简化并平滑轮廓（先 Douglas–Peucker 降噪，再 Chaikin 平滑）
+        outer_simplified = []
+        for c in outer_contours:
+            s = simplify_polygon(c)
+            p = chaikin_smooth(s, iterations=CONTOUR_SMOOTH_ITERS)
+            outer_simplified.append(p)
 
-        # 转换坐标到字体单位
-        img_h, img_w = binary_arr.shape
-        scale = units_per_em / img_w
+        inner_simplified = []
+        for c in inner_contours:
+            s = simplify_polygon(c)
+            p = chaikin_smooth(s, iterations=CONTOUR_SMOOTH_ITERS)
+            inner_simplified.append(p)
+
+        # 以墨迹外接框确定缩放比例，再把右边界贴到可用区域右侧，清掉右侧留白
+        if inner_simplified:
+            all_points = np.vstack(outer_simplified + inner_simplified)
+        else:
+            all_points = np.vstack(outer_simplified)
+
+        y_min = float(np.min(all_points[:, 0]))
+        y_max = float(np.max(all_points[:, 0]))
+        x_min = float(np.min(all_points[:, 1]))
+        x_max = float(np.max(all_points[:, 1]))
+
+        glyph_w = x_max - x_min
+        glyph_h = y_max - y_min
+        if glyph_w <= 0 or glyph_h <= 0:
+            return None
+
+        ink_points = np.argwhere(smoothed)
+        if ink_points.size == 0:
+            return None
+        centroid_y = float(np.mean(ink_points[:, 0]))
+        centroid_x = float(np.mean(ink_points[:, 1]))
+
+        # 统一固定可用区域（所有字使用相同 available box），并按墨迹重心在该区域等比居中
+        margin_ratio = 0.03
+        left = units_per_em * margin_ratio
+        right = units_per_em * (1 - margin_ratio)
+        bottom = DESCENT + (ASCENT - DESCENT) * margin_ratio
+        top = ASCENT - (ASCENT - DESCENT) * margin_ratio
+
+        available_w = right - left
+        available_h = top - bottom
+
+        # 计算统一缩放（在 available box 内等比缩放）
+        scale = min(available_w / glyph_w, available_h / glyph_h)
+
+        # 以墨迹质心为对齐中心（在 available box 内居中）
+        target_center_x = left + available_w / 2
+        target_center_y = bottom + available_h / 2
 
         def scale_points(points: np.ndarray) -> list[tuple[float, float]]:
-            # Y 轴翻转
             scaled = []
             for y, x in points:
-                font_x = x * scale
-                font_y = units_per_em - (y * scale)  # 翻转 Y
+                font_x = target_center_x + (x - centroid_x) * scale
+                font_y = target_center_y + (centroid_y - y) * scale
                 scaled.append((font_x, font_y))
             return scaled
 

@@ -446,6 +446,16 @@
             background: var(--card-alt);
             color: var(--ink-secondary);
         }
+        .strategy-select {
+            padding: 0.375rem 0.625rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.8125rem;
+            background: var(--card-alt);
+            color: var(--ink-secondary);
+            min-width: 160px;
+        }
         .font-status { font-size: 0.8125rem; color: var(--ink-faint); }
 
         .preview-textarea {
@@ -604,7 +614,15 @@
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">墨</div>
                     <div class="upload-title">拖拽、点击或粘贴单字图片</div>
-                    <div class="upload-hint">支持 PNG、JPG 格式</div>
+                        <div style="margin-top:0.75rem; display:flex; gap:0.5rem; justify-content:center; align-items:center;">
+                            <div class="upload-hint">支持 PNG、JPG 格式</div>
+                            <select id="preprocessStrategy" class="strategy-select" title="预处理策略" style="margin-left:0.5rem;">
+                                <option value="auto">自动 (auto)</option>
+                                <option value="strong">强去噪 (strong)</option>
+                                <option value="bgsub">背景减法 (bgsub)</option>
+                                <option value="original" selected>原始 (original)</option>
+                            </select>
+                        </div>
                 </div>
             </div>
 
@@ -754,25 +772,45 @@
             uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
                 uploadArea.classList.remove('dragover');
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith('image/')) uploadImage(file);
+                const files = e.dataTransfer.files;
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (file && file.type.startsWith('image/')) uploadImage(file);
+                }
             });
-            uploadArea.addEventListener('click', () => {
+            uploadArea.addEventListener('click', (event) => {
+                if (event?.target && event.target.closest && event.target.closest('#preprocessStrategy')) return;
                 const input = document.createElement('input');
                 input.type = 'file';
                 input.accept = 'image/*';
-                input.onchange = (e) => { if (e.target.files[0]) uploadImage(e.target.files[0]); };
+                input.multiple = true;
+                input.onchange = (e) => { 
+                    const files = e.target.files;
+                    for (let i = 0; i < files.length; i++) {
+                        if (files[i]) uploadImage(files[i]);
+                    }
+                };
                 input.click();
             });
+            const preprocessStrategy = document.getElementById('preprocessStrategy');
+            if (preprocessStrategy) {
+                preprocessStrategy.addEventListener('click', (e) => e.stopPropagation());
+                preprocessStrategy.addEventListener('mousedown', (e) => e.stopPropagation());
+                preprocessStrategy.addEventListener('pointerdown', (e) => e.stopPropagation());
+            }
             document.addEventListener('paste', (e) => {
                 const items = e.clipboardData?.items;
                 if (!items) return;
+                const filesToUpload = [];
                 for (const item of items) {
-                    if (item.type.startsWith('image/')) {
-                        e.preventDefault();
-                        uploadImage(item.getAsFile());
-                        return;
+                    if (item.type && item.type.startsWith('image/')) {
+                        const f = item.getAsFile();
+                        if (f) filesToUpload.push(f);
                     }
+                }
+                if (filesToUpload.length > 0) {
+                    e.preventDefault();
+                    filesToUpload.forEach(f => uploadImage(f));
                 }
             });
 
@@ -845,6 +883,9 @@
         async function uploadImage(file) {
             const formData = new FormData();
             formData.append('file', file);
+            // 附加预处理策略
+            const strategyEl = document.getElementById('preprocessStrategy');
+            if (strategyEl && strategyEl.value) formData.append('strategy', strategyEl.value);
 
             try {
                 showToast('正在处理...', 'info');
@@ -856,9 +897,22 @@
                 }
                 const result = await response.json();
 
+                // 尝试用文件名的第一个字符作为默认输入（若为单个汉字）
+                let defaultLabel = '';
+                try {
+                    const base = file && file.name ? file.name.replace(/\.[^/.]+$/, '') : '';
+                    if (base && base.length > 0) {
+                        const ch = base[0];
+                        if (/^[\u4e00-\u9fff]$/.test(ch)) defaultLabel = ch;
+                    }
+                } catch (e) {
+                    defaultLabel = '';
+                }
+
                 pending.push({
                     id: `p_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
                     image_base64: result.image_base64,
+                    default_label: defaultLabel,
                 });
 
                 showToast('已添加到待确认', 'success');
@@ -886,7 +940,7 @@
 
             showToast(`已收录: ${label}`, 'success');
             updateUI();
-            switchTab('confirmed');
+            // 不要在确认后自动切换到已收录标签，保留当前视图
             debouncedGeneratePreview();
         }
 
@@ -1017,10 +1071,11 @@
             pending.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'char-card';
+                const defaultVal = item.default_label ? item.default_label : '';
                 card.innerHTML = `
                     <div class="char-image"><img src="data:image/png;base64,${item.image_base64}" alt="Pending"></div>
                     <div class="char-content">
-                        <input type="text" class="char-input" data-id="${item.id}" placeholder="输入标准字" maxlength="1">
+                        <input type="text" class="char-input" data-id="${item.id}" placeholder="输入标准字" maxlength="1" value="${defaultVal}">
                         <div class="char-actions">
                             <button class="btn btn-success confirm-btn" data-id="${item.id}">确认</button>
                             <button class="btn btn-danger-outline delete-btn" data-id="${item.id}">删除</button>

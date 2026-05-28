@@ -2,7 +2,7 @@
 import base64
 import io
 
-from fastapi import APIRouter, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
 from PIL import Image
 
 from app.services.preprocessor import preprocess_single_char
@@ -11,12 +11,13 @@ router = APIRouter(prefix="/api", tags=["preprocess"])
 
 
 @router.post("/preprocess")
-async def preprocess_image(file: UploadFile = File(...)) -> dict:
+async def preprocess_image(file: UploadFile = File(...), strategy: str | None = Form(None)) -> dict:
     """预处理单字图片，返回 base64 编码的处理后图片"""
     image_bytes = await file.read()
 
     try:
-        processed = preprocess_single_char(image_bytes)
+        # strategy may be None; preprocess_single_char will use its default
+        processed = preprocess_single_char(image_bytes, strategy=strategy) if strategy else preprocess_single_char(image_bytes)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
