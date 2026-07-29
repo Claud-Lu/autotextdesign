@@ -1,13 +1,17 @@
 """轮廓拟合服务"""
-from typing import Optional
 
 import numpy as np
-from PIL import Image
 from scipy import ndimage as ndi
-from skimage import measure, filters
+from skimage import measure
 
-from app.config import ASCENT, BLUR_SIGMA, CONTOUR_TOLERANCE, DESCENT, UNITS_PER_EM
-from app.config import CONTOUR_SMOOTH_ITERS
+from app.config import (
+    ASCENT,
+    BLUR_SIGMA,
+    CONTOUR_SMOOTH_ITERS,
+    CONTOUR_TOLERANCE,
+    DESCENT,
+    UNITS_PER_EM,
+)
 
 
 def smooth_contour(binary_arr: np.ndarray, sigma: float = BLUR_SIGMA) -> np.ndarray:
@@ -120,7 +124,7 @@ def chaikin_smooth(points: np.ndarray, iterations: int = CONTOUR_SMOOTH_ITERS) -
 
 def contours_to_glyph(
     binary_arr: np.ndarray, units_per_em: int = UNITS_PER_EM
-) -> Optional[dict]:
+) -> dict | None:
     """
     将轮廓转换为字形数据
 

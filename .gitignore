@@ -47,6 +47,9 @@ env/
 # Test artifacts
 test-font.ttf
 test.html
+.coverage
+htmlcov/
+.pytest_cache/
 
 # Build artifacts
 *.app

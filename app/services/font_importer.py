@@ -1,12 +1,11 @@
 """TTF 字体导入服务 — 解析 TTF 并渲染字形为图片"""
 import base64
 import io
-from typing import Optional
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
 
-from app.config import GLYPH_SIZE
+from app.config import GLYPH_SIZE, MAX_GLYPHS
 
 
 def import_ttf(ttf_bytes: bytes) -> dict:
@@ -22,44 +21,50 @@ def import_ttf(ttf_bytes: bytes) -> dict:
     from fontTools.ttLib import TTFont
 
     font = TTFont(io.BytesIO(ttf_bytes))
+    try:
+        font_name = _extract_font_name(font)
 
-    font_name = _extract_font_name(font)
+        cmap = font.getBestCmap()
+        if not cmap:
+            return {"glyphs": [], "font_name": font_name}
 
-    cmap = font.getBestCmap()
-    if not cmap:
-        font.close()
-        return {"glyphs": [], "font_name": font_name}
+        # 与前端可编辑范围保持一致：CJK 扩展 A、基本区和兼容区。
+        cjk_chars = {
+            codepoint: glyph_name
+            for codepoint, glyph_name in cmap.items()
+            if (
+                0x3400 <= codepoint <= 0x4DBF
+                or 0x4E00 <= codepoint <= 0x9FFF
+                or 0xF900 <= codepoint <= 0xFAFF
+            )
+        }
+        if not cjk_chars:
+            return {"glyphs": [], "font_name": font_name}
+        if len(cjk_chars) > MAX_GLYPHS:
+            raise ValueError(
+                f"字体包含 {len(cjk_chars)} 个汉字，超过单次导入 {MAX_GLYPHS} 个的上限"
+            )
 
-    # 筛选 CJK 字符
-    cjk_chars = {
-        c: g for c, g in cmap.items() if 0x4E00 <= c <= 0x9FFF
-    }
-    if not cjk_chars:
-        font.close()
-        return {"glyphs": [], "font_name": font_name}
+        glyph_set = font.getGlyphSet()
+        glyphs = []
+        for codepoint, glyph_name in sorted(cjk_chars.items()):
+            char = chr(codepoint)
+            try:
+                img = _render_glyph(glyph_set, glyph_name)
+                if img is None:
+                    continue
 
-    glyph_set = font.getGlyphSet()
-
-    glyphs = []
-    for codepoint, glyph_name in sorted(cjk_chars.items()):
-        char = chr(codepoint)
-        try:
-            img = _render_glyph(glyph_set, glyph_name)
-            if img is None:
+                buf = io.BytesIO()
+                img.save(buf, format="PNG")
+                img_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+                glyphs.append({"char": char, "image_base64": img_b64})
+            except Exception as exc:
+                print(f"  WARNING: 渲染 glyph {glyph_name} ({char}) 失败: {exc}")
                 continue
 
-            buf = io.BytesIO()
-            img.save(buf, format="PNG")
-            img_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
-
-            glyphs.append({"char": char, "image_base64": img_b64})
-        except Exception as e:
-            print(f"  WARNING: 渲染 glyph {glyph_name} ({char}) 失败: {e}")
-            continue
-
-    font.close()
-
-    return {"glyphs": glyphs, "font_name": font_name}
+        return {"glyphs": glyphs, "font_name": font_name}
+    finally:
+        font.close()
 
 
 def _extract_font_name(font) -> str:
@@ -77,7 +82,7 @@ def _extract_font_name(font) -> str:
     return "未命名字体"
 
 
-def _render_glyph(glyph_set, glyph_name: str) -> Optional[Image.Image]:
+def _render_glyph(glyph_set, glyph_name: str) -> Image.Image | None:
     """
     渲染单个字形为 GLYPH_SIZE x GLYPH_SIZE 图片（白底黑字）
 

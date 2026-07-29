@@ -5,24 +5,27 @@ import numpy as np
 from PIL import Image, ImageOps
 from scipy import ndimage as ndi
 from skimage import filters, morphology
-from pathlib import Path
 
 from app.config import (
-    GLYPH_SIZE,
+    BG_CLOSING_RADIUS,
+    BG_SIGMA,
     DEFAULT_PREPROCESS_STRATEGY,
+    GLYPH_SIZE,
+    MAX_IMAGE_PIXELS,
+    MIN_SIZE_RATIO,
+    OPENING_RADIUS,
+    PRE_BLUR_SIGMA,
+    STRONG_MIN_SIZE_RATIO,
+    STRONG_OPENING_RADIUS,
     TEXTURE_BG_SIGMA,
     TEXTURE_THRESHOLD,
-    STRONG_OPENING_RADIUS,
-    STRONG_MIN_SIZE_RATIO,
-    OPENING_RADIUS,
-    MIN_SIZE_RATIO,
-    BG_SIGMA,
-    BG_CLOSING_RADIUS,
-    PRE_BLUR_SIGMA,
 )
 
 
-def preprocess_single_char(image_bytes: bytes, strategy: str = DEFAULT_PREPROCESS_STRATEGY) -> Image.Image:
+def preprocess_single_char(
+    image_bytes: bytes,
+    strategy: str = DEFAULT_PREPROCESS_STRATEGY,
+) -> Image.Image:
     """
     预处理单字图片
 
@@ -32,8 +35,25 @@ def preprocess_single_char(image_bytes: bytes, strategy: str = DEFAULT_PREPROCES
     Returns:
         PIL.Image: 处理后的正方形图片 (1024x1024)
     """
-    # 加载图片
-    image = Image.open(BytesIO(image_bytes))
+    if not image_bytes:
+        raise ValueError("上传图片为空")
+
+    try:
+        image = Image.open(BytesIO(image_bytes))
+    except Exception as exc:
+        raise ValueError("无法识别图片格式") from exc
+
+    width, height = image.size
+    if width <= 0 or height <= 0:
+        raise ValueError("图片尺寸无效")
+    if width * height > MAX_IMAGE_PIXELS:
+        raise ValueError("图片像素过大，请压缩到 2500 万像素以内")
+
+    try:
+        image = ImageOps.exif_transpose(image)
+        image.load()
+    except Exception as exc:
+        raise ValueError("图片文件损坏或无法读取") from exc
 
     # 转换为灰度图
     if image.mode != "L":
@@ -76,11 +96,17 @@ def preprocess_single_char(image_bytes: bytes, strategy: str = DEFAULT_PREPROCES
         # 小尺度 closing 用于修复因二值化/背景减法导致的断笔
         closed_local = morphology.closing(opened_local, morphology.disk(BG_CLOSING_RADIUS))
         min_size_local = max(64, int(MIN_SIZE_RATIO * img_arr.size))
-        cleaned_local = morphology.remove_small_objects(closed_local, min_size=min_size_local)
-        cleaned_local = morphology.remove_small_holes(cleaned_local, area_threshold=min_size_local)
+        cleaned_local = morphology.remove_small_objects(
+            closed_local,
+            max_size=min_size_local - 1,
+        )
+        cleaned_local = morphology.remove_small_holes(
+            cleaned_local,
+            max_size=min_size_local - 1,
+        )
         return cleaned_local
 
-    # 支持多种策略：'auto'（原有自适应），'strong'（强去噪），'bgsub'（背景减法），'original'（原始路径）
+    # 支持 auto、strong、bgsub、original 四种预处理策略。
     strategy = strategy.lower() if strategy else "auto"
 
     if strategy == "strong":
@@ -92,8 +118,8 @@ def preprocess_single_char(image_bytes: bytes, strategy: str = DEFAULT_PREPROCES
         opened0 = morphology.opening(binary0, morphology.disk(STRONG_OPENING_RADIUS))
         closed0 = morphology.closing(opened0, morphology.disk(1))
         min_size0 = max(128, int(STRONG_MIN_SIZE_RATIO * arr.size))
-        cleaned0 = morphology.remove_small_objects(opened0, min_size=min_size0)
-        cleaned0 = morphology.remove_small_holes(cleaned0, area_threshold=min_size0)
+        cleaned0 = morphology.remove_small_objects(closed0, max_size=min_size0 - 1)
+        cleaned0 = morphology.remove_small_holes(cleaned0, max_size=min_size0 - 1)
         binary = cleaned0
 
     elif strategy == "bgsub":
@@ -107,8 +133,8 @@ def preprocess_single_char(image_bytes: bytes, strategy: str = DEFAULT_PREPROCES
         min_size = max(64, int(0.0005 * arr.size))
         opened = morphology.opening(binary, morphology.disk(2))
         closed = morphology.closing(opened, morphology.disk(1))
-        cleaned = morphology.remove_small_objects(closed, min_size=min_size)
-        cleaned = morphology.remove_small_holes(cleaned, area_threshold=min_size)
+        cleaned = morphology.remove_small_objects(closed, max_size=min_size - 1)
+        cleaned = morphology.remove_small_holes(cleaned, max_size=min_size - 1)
         binary = cleaned
 
     else:
@@ -122,8 +148,8 @@ def preprocess_single_char(image_bytes: bytes, strategy: str = DEFAULT_PREPROCES
             min_size = max(64, int(MIN_SIZE_RATIO * arr.size))
             opened = morphology.opening(binary, morphology.disk(OPENING_RADIUS))
             closed = morphology.closing(opened, morphology.disk(1))
-            cleaned = morphology.remove_small_objects(closed, min_size=min_size)
-            cleaned = morphology.remove_small_holes(cleaned, area_threshold=min_size)
+            cleaned = morphology.remove_small_objects(closed, max_size=min_size - 1)
+            cleaned = morphology.remove_small_holes(cleaned, max_size=min_size - 1)
             binary = cleaned
 
     # 找墨迹 bbox
@@ -131,11 +157,13 @@ def preprocess_single_char(image_bytes: bytes, strategy: str = DEFAULT_PREPROCES
     cols = np.any(binary, axis=0)
 
     if not np.any(rows) or not np.any(cols):
-        # 空白图片，返回空白正方形
-        return Image.new("L", (GLYPH_SIZE, GLYPH_SIZE), 255)
+        raise ValueError("未检测到有效墨迹")
 
     y0, y1 = np.where(rows)[0][[0, -1]]
     x0, x1 = np.where(cols)[0][[0, -1]]
+    # numpy 切片右边界不包含末位像素。
+    y1 += 1
+    x1 += 1
 
     # 裁剪 + 10% 边距
     height = y1 - y0

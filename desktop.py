@@ -3,7 +3,6 @@
 使用 pywebview 将 FastAPI 包装为原生桌面窗口
 """
 import multiprocessing
-import os
 import sys
 import time
 
@@ -27,16 +26,6 @@ def start_server(port: int) -> None:
 def main() -> None:
     port = find_free_port()
 
-    # PyInstaller 打包后资源路径
-    if getattr(sys, "frozen", False):
-        base_path = sys._MEIPASS
-    else:
-        base_path = os.path.dirname(os.path.abspath(__file__))
-
-    # 确保 data 目录存在
-    data_dir = os.path.join(base_path, "..", "data")
-    os.makedirs(os.path.join(data_dir, "projects"), exist_ok=True)
-
     # 子进程启动 FastAPI
     server = multiprocessing.Process(target=start_server, args=(port,), daemon=True)
     server.start()
@@ -52,7 +41,7 @@ def main() -> None:
             time.sleep(0.2)
 
     # 创建原生窗口
-    window = webview.create_window(
+    webview.create_window(
         title="书法字体制作器",
         url=url,
         width=1200,

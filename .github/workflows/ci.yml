@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Lint Python
+        run: ruff check .
+
+      - name: Check scripts
+        run: |
+          bash -n build.sh
+          sed -n '/^[[:space:]]*<script>$/,/^[[:space:]]*<\/script>$/p' app/static/index.html \
+            | sed '1d;$d' \
+            | node --check
+
+      - name: Run tests
+        run: pytest --cov=app --cov-report=term-missing

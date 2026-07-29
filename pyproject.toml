@@ -1,0 +1,14 @@
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["app"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["tools"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

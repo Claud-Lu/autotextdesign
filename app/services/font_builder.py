@@ -4,10 +4,10 @@ import io
 import re
 
 import numpy as np
-from PIL import Image
 from fontTools.pens.ttGlyphPen import TTGlyphPen
+from PIL import Image
 
-from app.config import ASCENT, DESCENT, GLYPH_SIZE, UNITS_PER_EM
+from app.config import ASCENT, DESCENT, UNITS_PER_EM
 from app.services.contour_fitter import contours_to_glyph
 
 

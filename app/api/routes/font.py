@@ -1,18 +1,23 @@
 """字体导入与生成 API 路由"""
+import logging
+from typing import Annotated
 from urllib.parse import quote
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from fastapi.responses import Response
 
-from app.api.models import GenerateRequest, GlyphInput
+from app.api.limits import read_upload_limited, run_processing
+from app.api.models import GenerateRequest
+from app.config import MAX_TTF_UPLOAD_BYTES
 from app.services.font_builder import build_font_from_data
 from app.services.font_importer import import_ttf
 
 router = APIRouter(prefix="/api", tags=["font"])
+logger = logging.getLogger(__name__)
 
 
 @router.post("/import-ttf")
-async def import_ttf_file(file: UploadFile = File(...)) -> dict:
+async def import_ttf_file(file: Annotated[UploadFile, File()]) -> dict:
     """导入已有 TTF 字体，提取字形返回"""
     if not file.filename or not file.filename.lower().endswith(".ttf"):
         raise HTTPException(
@@ -20,15 +25,23 @@ async def import_ttf_file(file: UploadFile = File(...)) -> dict:
             detail="请上传 TTF 字体文件",
         )
 
-    ttf_bytes = await file.read()
+    ttf_bytes = await read_upload_limited(file, MAX_TTF_UPLOAD_BYTES)
 
     try:
-        result = import_ttf(ttf_bytes)
-    except Exception as e:
+        result = await run_processing(import_ttf, ttf_bytes)
+    except HTTPException:
+        raise
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("TTF import failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"TTF 解析失败: {str(e)}",
-        )
+            detail="TTF 解析失败，请确认文件完整且格式受支持",
+        ) from exc
 
     return result
 
@@ -43,25 +56,33 @@ async def generate_font(data: GenerateRequest) -> Response:
         )
 
     try:
-        font_bytes = build_font_from_data(
+        font_bytes = await run_processing(
+            build_font_from_data,
             [g.model_dump() for g in data.glyphs],
             data.font_name,
         )
-    except ValueError as e:
+    except HTTPException:
+        raise
+    except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
-    except Exception as e:
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Font generation failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"字体生成失败: {str(e)}",
-        )
+            detail="字体生成失败，请检查字形数据后重试",
+        ) from exc
 
     return Response(
         content=font_bytes,
         media_type="font/ttf",
-        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quote(data.font_name)}.ttf"},
+        headers={
+            "Content-Disposition": (
+                f"attachment; filename*=UTF-8''{quote(data.font_name)}.ttf"
+            )
+        },
     )
 
 
@@ -75,20 +96,24 @@ async def preview_font(data: GenerateRequest) -> Response:
         )
 
     try:
-        font_bytes = build_font_from_data(
+        font_bytes = await run_processing(
+            build_font_from_data,
             [g.model_dump() for g in data.glyphs],
             data.font_name,
         )
-    except ValueError as e:
+    except HTTPException:
+        raise
+    except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
-    except Exception as e:
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Font preview generation failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"预览生成失败: {str(e)}",
-        )
+            detail="预览生成失败，请检查字形数据后重试",
+        ) from exc
 
     return Response(
         content=font_bytes,

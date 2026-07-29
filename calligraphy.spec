@@ -1,7 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 """PyInstaller spec for 书法字体制作器"""
 
+import os
 import sys
+
+app_version = os.environ.get('APP_VERSION', '1.2.0').removeprefix('v')
 
 a = Analysis(
     ['desktop.py'],
@@ -22,17 +25,12 @@ a = Analysis(
         'uvicorn.lifespan',
         'uvicorn.lifespan.on',
         'multipart',
-        'pytesseract',
         'app.main',
-        'app.api.routes.projects',
-        'app.api.routes.segmentation',
-        'app.api.routes.characters',
         'app.api.routes.font',
-        'app.services.project_service',
+        'app.api.routes.preprocess',
+        'app.middleware.request_guard',
+        'app.services.font_importer',
         'app.services.preprocessor',
-        'app.services.segmenter',
-        'app.services.grid_cutter',
-        'app.services.ocr',
         'app.services.contour_fitter',
         'app.services.font_builder',
     ],
@@ -81,7 +79,8 @@ if sys.platform == 'darwin':
         coll,
         name='书法字体制作器.app',
         info_plist={
-            'CFBundleShortVersionString': '1.0.0',
+            'CFBundleShortVersionString': app_version,
+            'CFBundleVersion': app_version,
             'CFBundleIdentifier': 'com.autotextdesign.app',
             'NSHighResolutionCapable': True,
         },

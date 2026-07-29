@@ -4,11 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>书法字体制作器</title>
+    <meta name="description" content="免费在线把手写或书法单字图片转换为可安装的 TTF 字体。支持批量上传、自动去噪、本地保存和项目文件备份。">
+    <meta name="keywords" content="书法字体,手写字体,字体制作器,TTF,字体生成,在线工具">
+    <meta name="theme-color" content="#1C1917">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="书法字体制作器">
+    <meta property="og:description" content="批量上传手写单字图片，自动处理并生成可安装的 TTF 字体。无需注册，项目保存在本地。">
+    <meta property="og:url" content="https://font.chathappy.cn/">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://font.chathappy.cn/">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "书法字体制作器",
+            "url": "https://font.chathappy.cn/",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "Web",
+            "isAccessibleForFree": true,
+            "description": "将手写或书法单字图片转换为可安装的 TTF 字体。"
+        }
+    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        [hidden] { display: none !important; }
 
         :root {
             --cinnabar: #B8433A;
@@ -100,10 +123,13 @@
         .btn-primary:hover { background: var(--cinnabar-deep); }
         .btn-ghost { background: rgba(245, 240, 235, 0.08); color: #A8A29E; }
         .btn-ghost:hover { background: rgba(245, 240, 235, 0.15); color: #F5F0EB; }
+        .btn-secondary { background: var(--card-alt); color: var(--ink-secondary); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--cinnabar); color: var(--cinnabar); }
         .btn-danger-outline { background: transparent; color: var(--ink-faint); border: 1px solid var(--border); }
         .btn-danger-outline:hover { border-color: var(--error); color: var(--error); }
         .btn-success { background: var(--success); color: #fff; }
         .btn-success:hover { background: #4A7A49; }
+        .btn:disabled { cursor: not-allowed; opacity: 0.45; }
 
         .main {
             max-width: 1600px;
@@ -281,6 +307,15 @@
             color: var(--cinnabar);
             font-weight: 700;
         }
+        .save-status {
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            margin-left: auto;
+            white-space: nowrap;
+        }
+        .save-status.is-saving { color: var(--gold); }
+        .save-status.is-saved { color: var(--success); }
+        .save-status.is-error { color: var(--error); }
 
         /* Upload */
         .upload-section {
@@ -325,6 +360,48 @@
         .upload-icon { font-size: 2.25rem; margin-bottom: 0.75rem; opacity: 0.7; }
         .upload-title { font-size: 1rem; font-weight: 500; margin-bottom: 0.375rem; color: var(--ink-secondary); }
         .upload-hint { font-size: 0.8125rem; color: var(--ink-faint); }
+        .upload-progress {
+            margin-top: 1rem;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            background: var(--card-alt);
+        }
+        .upload-progress-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.8125rem;
+            color: var(--ink-muted);
+        }
+        .progress-track {
+            height: 6px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: var(--border);
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            border-radius: inherit;
+            background: var(--cinnabar);
+            transition: width 0.2s ease;
+        }
+        .batch-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .batch-actions .btn { flex-shrink: 0; }
+        .batch-hint {
+            min-width: 0;
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            line-height: 1.4;
+        }
 
         /* Tabs */
         .tabs {
@@ -570,6 +647,8 @@
             .preview-compare { grid-template-columns: 1fr; }
             .toolbar { flex-direction: column; align-items: flex-start; }
             .toolbar-divider { width: 100%; height: 1px; }
+            .toolbar .btn, .font-name-input { width: 100%; }
+            .save-status { margin-left: 0; }
         }
         @media (max-width: 640px) {
             .sidebar .character-grid { grid-template-columns: 1fr; }
@@ -594,8 +673,8 @@
         <div class="content-area">
             <!-- Notice -->
             <div class="notice-bar">
-                <p>📌 如需继续修改已有字体，请优先<strong>导入 TTF 文件</strong>，再进行上传或收录。</p>
-                <p>⚠️ 本网站不存储字体数据，修改后请<strong>及时下载字体保存</strong>；后续修改可重新导入继续制作。</p>
+                <p>📌 制作进度会<strong>自动保存在当前浏览器</strong>，也可以导出项目文件备份或换设备继续。</p>
+                <p>🔒 本网站不在服务器保存字体数据；完成后请下载 TTF，项目文件用于无损继续编辑。</p>
             </div>
 
             <!-- Toolbar -->
@@ -603,9 +682,13 @@
                 <span class="toolbar-label">字体名称</span>
                 <input type="text" id="fontNameInput" class="font-name-input" value="未命名字体" placeholder="输入字体名称">
                 <div class="toolbar-divider"></div>
-                <button id="importTtfBtn" class="btn btn-ghost">导入 TTF</button>
+                <button id="importProjectBtn" class="btn btn-secondary">导入项目</button>
+                <button id="exportProjectBtn" class="btn btn-secondary">导出项目</button>
+                <button id="importTtfBtn" class="btn btn-secondary">导入 TTF</button>
+                <button id="newProjectBtn" class="btn btn-danger-outline">清空当前</button>
                 <div class="toolbar-divider"></div>
                 <span class="stat-chip">已收录 <strong id="glyphCount">0</strong> 字</span>
+                <span id="saveStatus" class="save-status">正在加载本地项目…</span>
             </div>
 
             <!-- Upload -->
@@ -615,14 +698,23 @@
                     <div class="upload-icon">墨</div>
                     <div class="upload-title">拖拽、点击或粘贴单字图片</div>
                         <div style="margin-top:0.75rem; display:flex; gap:0.5rem; justify-content:center; align-items:center;">
-                            <div class="upload-hint">支持 PNG、JPG 格式</div>
+                            <div class="upload-hint">支持 PNG、JPG、WebP、BMP 格式</div>
                             <select id="preprocessStrategy" class="strategy-select" title="预处理策略" style="margin-left:0.5rem;">
-                                <option value="auto">自动 (auto)</option>
-                                <option value="strong">强去噪 (strong)</option>
-                                <option value="bgsub">背景减法 (bgsub)</option>
-                                <option value="original" selected>原始 (original)</option>
+                                <option value="auto">自动判断</option>
+                                <option value="original" selected>扫描稿（干净背景）</option>
+                                <option value="bgsub">手机拍照（去背景）</option>
+                                <option value="strong">纹理纸张（强去噪）</option>
                             </select>
                         </div>
+                </div>
+                <div id="uploadProgress" class="upload-progress" hidden>
+                    <div class="upload-progress-row">
+                        <span id="uploadProgressText">准备处理…</span>
+                        <span id="uploadFailureText"></span>
+                    </div>
+                    <div class="progress-track" role="progressbar" aria-label="图片处理进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div id="uploadProgressBar" class="progress-bar"></div>
+                    </div>
                 </div>
             </div>
 
@@ -665,6 +757,10 @@
                     <button class="tab active" data-tab="pending">待确认 <span id="pendingCount">(0)</span></button>
                     <button class="tab" data-tab="confirmed">已收录 <span id="confirmedCount">(0)</span></button>
                 </div>
+                <div id="batchActions" class="batch-actions" hidden>
+                    <button id="confirmAllNamedBtn" class="btn btn-success">按文件名全部收录</button>
+                    <span id="batchHint" class="batch-hint"></span>
+                </div>
 
                 <!-- Search -->
                 <div class="sidebar-search">
@@ -681,7 +777,7 @@
     </main>
 
     <footer class="footer">
-        <p>书法字体制作器 — 由 <strong>谷子、小兽</strong> 研发 <span style="margin-left: 0.5rem; color: var(--color-muted); font-size: 0.875rem;">V20260528-155827</span></p>
+        <p>书法字体制作器 — 由 <strong>谷子、小兽</strong> 研发 <span style="margin-left: 0.5rem; color: var(--color-muted); font-size: 0.875rem;">v1.2.0</span></p>
     </footer>
 
     <!-- About Modal -->
@@ -692,7 +788,7 @@
             <div class="about-divider"></div>
             <div class="about-body">
                 上传手写单字图片，输入对应标准汉字确认收录，<br>自动生成可安装的 TTF 字体文件。<br>
-                支持导入已有 TTF 继续编辑。
+                支持本地自动保存、项目文件备份和导入已有 TTF。
             </div>
             <div style="margin-bottom: 1.25rem;">
                 <a href="https://github.com/Claud-Lu/autotextdesign" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--ink-secondary); text-decoration: none; font-size: 0.8125rem; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); transition: all 0.2s;">
@@ -713,13 +809,36 @@
 
     <script>
         const API_BASE = '/api';
+        const PROJECT_SCHEMA_VERSION = 1;
+        const PROJECT_DB_NAME = 'autotextdesign';
+        const PROJECT_STORE_NAME = 'projects';
+        const PROJECT_STORAGE_KEY = 'current';
+        const MAX_UPLOAD_CONCURRENCY = 3;
+        const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+        const MAX_TTF_BYTES = 30 * 1024 * 1024;
+        const MAX_PROJECT_BYTES = 100 * 1024 * 1024;
+        const MAX_PROJECT_IMAGE_BASE64 = 15 * 1024 * 1024;
 
         // ===== State =====
-        let pending = [];        // [{id, image_base64}]
+        let pending = [];        // [{id, image_base64, default_label}]
         let glyphs = new Map();  // char → image_base64
         let fontName = '未命名字体';
-        let fontVersion = 0;
         let previewDebounce = null;
+        let previewGenerating = false;
+        let previewNeedsRerun = false;
+        let previewRequestVersion = 0;
+        let previewObjectUrl = null;
+        let projectLoaded = false;
+        let saveTimer = null;
+        let dbPromise = null;
+
+        let uploadQueue = [];
+        let activeUploads = 0;
+        let uploadBatchTotal = 0;
+        let uploadBatchCompleted = 0;
+        let uploadBatchFailures = [];
+        let uploadBatchActive = false;
+        let uploadProgressHideTimer = null;
 
         // ===== DOM =====
         const fontNameInput = document.getElementById('fontNameInput');
@@ -730,30 +849,47 @@
         const previewInput = document.getElementById('previewInput');
         const fontStatus = document.getElementById('fontStatus');
         const downloadFontBtn = document.getElementById('downloadFontBtn');
+        const saveStatus = document.getElementById('saveStatus');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const uploadProgressText = document.getElementById('uploadProgressText');
+        const uploadFailureText = document.getElementById('uploadFailureText');
+        const uploadProgressBar = document.getElementById('uploadProgressBar');
 
-        // ===== Init =====
-        setupEventListeners();
-        updateUI();
+        init();
+
+        async function init() {
+            setupEventListeners();
+            updateUI();
+            await restoreCurrentProject();
+            projectLoaded = true;
+            updateUI();
+            if (glyphs.size > 0) await generatePreview();
+        }
 
         // ===== Event Listeners =====
         function setupEventListeners() {
-            // Font name
             fontNameInput.addEventListener('input', () => {
                 fontName = fontNameInput.value.trim() || '未命名字体';
+                scheduleProjectSave();
+                debouncedGeneratePreview();
             });
 
-            // Import TTF
+            document.getElementById('importProjectBtn').addEventListener('click', chooseProjectFile);
+            document.getElementById('exportProjectBtn').addEventListener('click', exportProject);
+            document.getElementById('newProjectBtn').addEventListener('click', clearCurrentProject);
+            document.getElementById('confirmAllNamedBtn').addEventListener('click', confirmAllNamed);
+
             document.getElementById('importTtfBtn').addEventListener('click', () => {
                 const input = document.createElement('input');
                 input.type = 'file';
-                input.accept = '.ttf';
-                input.onchange = (e) => {
-                    if (e.target.files[0]) importTTF(e.target.files[0]);
+                input.accept = '.ttf,font/ttf';
+                input.onchange = (event) => {
+                    const file = event.target.files[0];
+                    if (file) importTTF(file);
                 };
                 input.click();
             });
 
-            // About
             document.getElementById('aboutBtn').addEventListener('click', () => {
                 document.getElementById('aboutModal').classList.add('show');
             });
@@ -761,81 +897,66 @@
                 document.getElementById('aboutModal').classList.remove('show');
             });
 
-            // Tabs
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', () => switchTab(tab.dataset.tab));
             });
 
-            // Upload
-            uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-            uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
+            uploadArea.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            uploadArea.addEventListener('dragleave', () => {
                 uploadArea.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    if (file && file.type.startsWith('image/')) uploadImage(file);
-                }
+            });
+            uploadArea.addEventListener('drop', (event) => {
+                event.preventDefault();
+                uploadArea.classList.remove('dragover');
+                enqueueFiles(event.dataTransfer.files);
             });
             uploadArea.addEventListener('click', (event) => {
-                if (event?.target && event.target.closest && event.target.closest('#preprocessStrategy')) return;
+                if (event.target?.closest?.('#preprocessStrategy')) return;
                 const input = document.createElement('input');
                 input.type = 'file';
-                input.accept = 'image/*';
+                input.accept = 'image/png,image/jpeg,image/webp,image/bmp';
                 input.multiple = true;
-                input.onchange = (e) => { 
-                    const files = e.target.files;
-                    for (let i = 0; i < files.length; i++) {
-                        if (files[i]) uploadImage(files[i]);
-                    }
-                };
+                input.onchange = (changeEvent) => enqueueFiles(changeEvent.target.files);
                 input.click();
             });
+
             const preprocessStrategy = document.getElementById('preprocessStrategy');
-            if (preprocessStrategy) {
-                preprocessStrategy.addEventListener('click', (e) => e.stopPropagation());
-                preprocessStrategy.addEventListener('mousedown', (e) => e.stopPropagation());
-                preprocessStrategy.addEventListener('pointerdown', (e) => e.stopPropagation());
-            }
-            document.addEventListener('paste', (e) => {
-                const items = e.clipboardData?.items;
+            preprocessStrategy.addEventListener('click', (event) => event.stopPropagation());
+            preprocessStrategy.addEventListener('mousedown', (event) => event.stopPropagation());
+            preprocessStrategy.addEventListener('pointerdown', (event) => event.stopPropagation());
+
+            document.addEventListener('paste', (event) => {
+                const items = event.clipboardData?.items;
                 if (!items) return;
-                const filesToUpload = [];
+                const files = [];
                 for (const item of items) {
-                    if (item.type && item.type.startsWith('image/')) {
-                        const f = item.getAsFile();
-                        if (f) filesToUpload.push(f);
+                    if (item.type?.startsWith('image/')) {
+                        const file = item.getAsFile();
+                        if (file) files.push(file);
                     }
                 }
-                if (filesToUpload.length > 0) {
-                    e.preventDefault();
-                    filesToUpload.forEach(f => uploadImage(f));
+                if (files.length > 0) {
+                    event.preventDefault();
+                    enqueueFiles(files);
                 }
             });
 
-            // Preview
             previewInput.addEventListener('input', () => {
                 updatePreviewText();
-                debouncedGeneratePreview();
             });
-            document.getElementById('fontSize').addEventListener('change', () => {
-                updatePreviewText();
-            });
-
-            // Download
+            document.getElementById('fontSize').addEventListener('change', updatePreviewText);
             downloadFontBtn.addEventListener('click', downloadFont);
-
-            // Sidebar search
             document.getElementById('charSearch').addEventListener('input', filterSidebar);
 
-            // Keyboard shortcuts
-            document.addEventListener('keydown', (e) => {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            document.addEventListener('keydown', (event) => {
+                if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
+                if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
                     const tabs = document.querySelectorAll('.tab');
-                    const activeIndex = Array.from(tabs).findIndex(t => t.classList.contains('active'));
-                    const newIndex = e.key === 'ArrowRight'
+                    const activeIndex = Array.from(tabs).findIndex(tab => tab.classList.contains('active'));
+                    const newIndex = event.key === 'ArrowRight'
                         ? Math.min(activeIndex + 1, tabs.length - 1)
                         : Math.max(activeIndex - 1, 0);
                     tabs[newIndex].click();
@@ -843,155 +964,485 @@
             });
         }
 
+        // ===== Local Project Storage =====
+        function openProjectDatabase() {
+            if (!('indexedDB' in window)) {
+                return Promise.reject(new Error('当前浏览器不支持 IndexedDB'));
+            }
+            if (dbPromise) return dbPromise;
+
+            dbPromise = new Promise((resolve, reject) => {
+                const request = indexedDB.open(PROJECT_DB_NAME, 1);
+                request.onupgradeneeded = () => {
+                    const db = request.result;
+                    if (!db.objectStoreNames.contains(PROJECT_STORE_NAME)) {
+                        db.createObjectStore(PROJECT_STORE_NAME);
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('本地数据库打开失败'));
+            });
+            return dbPromise;
+        }
+
+        function createProjectPayload() {
+            return {
+                app: 'autotextdesign',
+                schema_version: PROJECT_SCHEMA_VERSION,
+                font_name: fontName,
+                pending: pending.map(item => ({
+                    image_base64: item.image_base64,
+                    default_label: item.default_label || '',
+                })),
+                glyphs: [...glyphs.entries()].map(([char, image_base64]) => ({
+                    char,
+                    image_base64,
+                })),
+                updated_at: new Date().toISOString(),
+            };
+        }
+
+        function scheduleProjectSave() {
+            if (!projectLoaded) return;
+            clearTimeout(saveTimer);
+            setSaveStatus('正在保存…', 'is-saving');
+            saveTimer = setTimeout(persistCurrentProject, 350);
+        }
+
+        async function persistCurrentProject() {
+            try {
+                const db = await openProjectDatabase();
+                await new Promise((resolve, reject) => {
+                    const transaction = db.transaction(PROJECT_STORE_NAME, 'readwrite');
+                    transaction.objectStore(PROJECT_STORE_NAME).put(
+                        createProjectPayload(),
+                        PROJECT_STORAGE_KEY,
+                    );
+                    transaction.oncomplete = () => resolve();
+                    transaction.onerror = () => reject(transaction.error || new Error('保存失败'));
+                    transaction.onabort = () => reject(transaction.error || new Error('保存已取消'));
+                });
+                setSaveStatus('已自动保存于本机', 'is-saved');
+            } catch (error) {
+                console.error('Project save failed:', error);
+                setSaveStatus('自动保存失败，请导出项目备份', 'is-error');
+            }
+        }
+
+        async function restoreCurrentProject() {
+            try {
+                const db = await openProjectDatabase();
+                const saved = await new Promise((resolve, reject) => {
+                    const transaction = db.transaction(PROJECT_STORE_NAME, 'readonly');
+                    const request = transaction.objectStore(PROJECT_STORE_NAME).get(PROJECT_STORAGE_KEY);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error || new Error('读取失败'));
+                });
+
+                if (saved) {
+                    applyNormalizedProject(normalizeProjectData(saved));
+                    setSaveStatus('已恢复本地项目', 'is-saved');
+                } else {
+                    setSaveStatus('本地自动保存已开启', 'is-saved');
+                }
+            } catch (error) {
+                console.error('Project restore failed:', error);
+                setSaveStatus('本地自动保存不可用', 'is-error');
+            }
+        }
+
+        function setSaveStatus(text, stateClass = '') {
+            saveStatus.textContent = text;
+            saveStatus.className = `save-status ${stateClass}`.trim();
+        }
+
+        function isValidChar(value) {
+            return typeof value === 'string'
+                && /^[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]$/.test(value);
+        }
+
+        function isValidImageBase64(value) {
+            return typeof value === 'string'
+                && value.length > 16
+                && value.length <= MAX_PROJECT_IMAGE_BASE64
+                && /^[A-Za-z0-9+/]+={0,2}$/.test(value);
+        }
+
+        function normalizeProjectData(raw) {
+            if (!raw || typeof raw !== 'object') throw new Error('项目文件格式无效');
+            if (raw.app && raw.app !== 'autotextdesign') throw new Error('不是 autotextdesign 项目文件');
+            if (raw.schema_version && raw.schema_version > PROJECT_SCHEMA_VERSION) {
+                throw new Error('项目文件来自更高版本，请升级后再导入');
+            }
+
+            const normalizedPending = [];
+            for (const item of Array.isArray(raw.pending) ? raw.pending : []) {
+                if (!isValidImageBase64(item?.image_base64)) continue;
+                normalizedPending.push({
+                    id: createPendingId(),
+                    image_base64: item.image_base64,
+                    default_label: isValidChar(item.default_label) ? item.default_label : '',
+                });
+            }
+
+            const normalizedGlyphs = new Map();
+            for (const item of Array.isArray(raw.glyphs) ? raw.glyphs : []) {
+                const char = Array.isArray(item) ? item[0] : item?.char;
+                const imageBase64 = Array.isArray(item) ? item[1] : item?.image_base64;
+                if (isValidChar(char) && isValidImageBase64(imageBase64)) {
+                    normalizedGlyphs.set(char, imageBase64);
+                }
+            }
+
+            if (normalizedPending.length + normalizedGlyphs.size > 5000) {
+                throw new Error('项目中的字形数量超过 5000 个');
+            }
+
+            return {
+                fontName: typeof raw.font_name === 'string' && raw.font_name.trim()
+                    ? raw.font_name.trim().slice(0, 80)
+                    : '未命名字体',
+                pending: normalizedPending,
+                glyphs: normalizedGlyphs,
+            };
+        }
+
+        function applyNormalizedProject(project) {
+            pending = project.pending;
+            glyphs = project.glyphs;
+            fontName = project.fontName;
+            fontNameInput.value = fontName;
+            clearDynamicPreview();
+        }
+
+        function chooseProjectFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,.atd.json,application/json';
+            input.onchange = async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                if (file.size > MAX_PROJECT_BYTES) {
+                    showToast('项目文件不能超过 100MB', 'error');
+                    return;
+                }
+
+                try {
+                    const project = normalizeProjectData(JSON.parse(await file.text()));
+                    if ((pending.length > 0 || glyphs.size > 0)
+                        && !window.confirm('导入项目会替换当前内容，确定继续吗？')) {
+                        return;
+                    }
+                    applyNormalizedProject(project);
+                    updateUI();
+                    scheduleProjectSave();
+                    if (glyphs.size > 0) await generatePreview();
+                    showToast(`项目已导入，共 ${glyphs.size} 个已收录字`, 'success');
+                } catch (error) {
+                    console.error('Project import failed:', error);
+                    showToast(error.message || '项目导入失败', 'error');
+                }
+            };
+            input.click();
+        }
+
+        function exportProject() {
+            const payload = JSON.stringify(createProjectPayload(), null, 2);
+            const blob = new Blob([payload], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = `${safeFilename(fontName)}.atd.json`;
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('项目文件已导出', 'success');
+        }
+
+        function clearCurrentProject() {
+            if ((pending.length > 0 || glyphs.size > 0)
+                && !window.confirm('确定清空当前项目吗？建议先导出项目文件备份。')) {
+                return;
+            }
+            pending = [];
+            glyphs = new Map();
+            fontName = '未命名字体';
+            fontNameInput.value = fontName;
+            previewRequestVersion++;
+            clearDynamicPreview();
+            updateUI();
+            scheduleProjectSave();
+            showToast('已创建空白项目', 'success');
+        }
+
         // ===== Import TTF =====
         async function importTTF(file) {
-            showToast('正在解析字体...', 'info');
+            if (file.size > MAX_TTF_BYTES) {
+                showToast('TTF 文件不能超过 30MB', 'error');
+                return;
+            }
+
+            showToast('正在解析字体…', 'info');
             const formData = new FormData();
             formData.append('file', file);
 
             try {
                 const response = await fetch(`${API_BASE}/import-ttf`, { method: 'POST', body: formData });
-                if (!response.ok) {
-                    const error = await response.json();
-                    showToast(error.detail || '导入失败', 'error');
-                    return;
-                }
+                if (!response.ok) throw new Error(await readErrorDetail(response, '导入失败'));
                 const result = await response.json();
 
-                // Add imported glyphs to state
-                for (const g of result.glyphs) {
-                    glyphs.set(g.char, g.image_base64);
+                for (const item of result.glyphs || []) {
+                    if (isValidChar(item.char) && isValidImageBase64(item.image_base64)) {
+                        glyphs.set(item.char, item.image_base64);
+                    }
                 }
 
-                // Update font name if user hasn't changed it
                 if (fontNameInput.value === '未命名字体' || !fontNameInput.value.trim()) {
-                    fontName = result.font_name;
+                    fontName = typeof result.font_name === 'string' && result.font_name.trim()
+                        ? result.font_name.trim().slice(0, 80)
+                        : '未命名字体';
                     fontNameInput.value = fontName;
                 }
 
-                showToast(`导入成功，共 ${result.glyphs.length} 个字`, 'success');
                 updateUI();
+                scheduleProjectSave();
                 switchTab('confirmed');
                 await generatePreview();
+                showToast(`导入成功，共 ${result.glyphs?.length || 0} 个字`, 'success');
             } catch (error) {
-                console.error('Import failed:', error);
-                showToast('导入失败', 'error');
+                console.error('TTF import failed:', error);
+                showToast(error.message || '导入失败', 'error');
             }
         }
 
-        // ===== Upload Image =====
+        // ===== Upload Queue =====
+        function enqueueFiles(fileList) {
+            const allFiles = Array.from(fileList || []);
+            const accepted = [];
+            let rejected = 0;
+
+            for (const file of allFiles) {
+                if (!file?.type?.startsWith('image/') || file.size > MAX_IMAGE_BYTES) {
+                    rejected++;
+                    continue;
+                }
+                accepted.push(file);
+            }
+
+            if (rejected > 0) {
+                showToast(`${rejected} 个文件格式不支持或超过 10MB`, 'error');
+            }
+            if (accepted.length === 0) return;
+
+            if (!uploadBatchActive) {
+                uploadBatchActive = true;
+                uploadBatchTotal = 0;
+                uploadBatchCompleted = 0;
+                uploadBatchFailures = [];
+                clearTimeout(uploadProgressHideTimer);
+            }
+
+            uploadBatchTotal += accepted.length;
+            uploadQueue.push(...accepted);
+            uploadProgress.hidden = false;
+            updateUploadProgress();
+            processUploadQueue();
+        }
+
+        function processUploadQueue() {
+            while (activeUploads < MAX_UPLOAD_CONCURRENCY && uploadQueue.length > 0) {
+                const file = uploadQueue.shift();
+                activeUploads++;
+
+                uploadImage(file)
+                    .catch(error => {
+                        console.error(`Upload failed for ${file.name}:`, error);
+                        uploadBatchFailures.push(file.name || '未命名文件');
+                    })
+                    .finally(() => {
+                        activeUploads--;
+                        uploadBatchCompleted++;
+                        updateUploadProgress();
+                        processUploadQueue();
+                        finishUploadBatchIfReady();
+                    });
+            }
+        }
+
         async function uploadImage(file) {
             const formData = new FormData();
             formData.append('file', file);
-            // 附加预处理策略
-            const strategyEl = document.getElementById('preprocessStrategy');
-            if (strategyEl && strategyEl.value) formData.append('strategy', strategyEl.value);
+            formData.append('strategy', document.getElementById('preprocessStrategy').value);
 
-            try {
-                showToast('正在处理...', 'info');
-                const response = await fetch(`${API_BASE}/preprocess`, { method: 'POST', body: formData });
-                if (!response.ok) {
-                    const error = await response.json();
-                    showToast(error.detail || '处理失败', 'error');
-                    return;
+            const response = await fetch(`${API_BASE}/preprocess`, { method: 'POST', body: formData });
+            if (!response.ok) throw new Error(await readErrorDetail(response, '图片处理失败'));
+            const result = await response.json();
+            if (!isValidImageBase64(result.image_base64)) throw new Error('服务返回了无效图片');
+
+            pending.push({
+                id: createPendingId(),
+                image_base64: result.image_base64,
+                default_label: charFromFilename(file.name),
+            });
+            updateUI();
+            scheduleProjectSave();
+        }
+
+        function updateUploadProgress() {
+            const settled = Math.min(uploadBatchCompleted, uploadBatchTotal);
+            const percent = uploadBatchTotal > 0 ? Math.round((settled / uploadBatchTotal) * 100) : 0;
+            uploadProgressText.textContent = `正在处理 ${settled}/${uploadBatchTotal}`;
+            uploadFailureText.textContent = uploadBatchFailures.length > 0
+                ? `失败 ${uploadBatchFailures.length}`
+                : '';
+            uploadProgressBar.style.width = `${percent}%`;
+            const progressTrack = uploadProgress.querySelector('[role="progressbar"]');
+            progressTrack.setAttribute('aria-valuenow', String(percent));
+        }
+
+        function finishUploadBatchIfReady() {
+            if (!uploadBatchActive || activeUploads > 0 || uploadQueue.length > 0
+                || uploadBatchCompleted < uploadBatchTotal) {
+                return;
+            }
+
+            uploadBatchActive = false;
+            uploadProgressText.textContent = `处理完成 ${uploadBatchCompleted}/${uploadBatchTotal}`;
+            if (uploadBatchFailures.length > 0) {
+                showToast(`处理完成，${uploadBatchFailures.length} 个文件失败`, 'error');
+            } else {
+                showToast(`已处理 ${uploadBatchCompleted} 张图片`, 'success');
+            }
+            switchTab('pending');
+
+            uploadProgressHideTimer = setTimeout(() => {
+                if (!uploadBatchActive) uploadProgress.hidden = true;
+            }, 4000);
+        }
+
+        function charFromFilename(filename) {
+            const base = typeof filename === 'string' ? filename.replace(/\.[^/.]+$/, '') : '';
+            const char = Array.from(base)[0] || '';
+            return isValidChar(char) ? char : '';
+        }
+
+        function createPendingId() {
+            return `p_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+        }
+
+        // ===== Confirm & Delete =====
+        function confirmPending(id) {
+            const item = pending.find(entry => entry.id === id);
+            const input = document.querySelector(`input[data-id="${id}"]`);
+            if (!item || !input) return;
+
+            const label = input.value.trim();
+            if (!isValidChar(label)) {
+                showToast('请输入单个汉字', 'error');
+                return;
+            }
+            if (glyphs.has(label) && !window.confirm(`“${label}”已收录，是否用当前图片替换？`)) {
+                return;
+            }
+
+            glyphs.set(label, item.image_base64);
+            pending = pending.filter(entry => entry.id !== id);
+            updateUI();
+            scheduleProjectSave();
+            debouncedGeneratePreview();
+            showToast(`已收录：${label}`, 'success');
+        }
+
+        function confirmAllNamed() {
+            const counts = new Map();
+            for (const item of pending) {
+                if (isValidChar(item.default_label)) {
+                    counts.set(item.default_label, (counts.get(item.default_label) || 0) + 1);
                 }
-                const result = await response.json();
+            }
 
-                // 尝试用文件名的第一个字符作为默认输入（若为单个汉字）
-                let defaultLabel = '';
-                try {
-                    const base = file && file.name ? file.name.replace(/\.[^/.]+$/, '') : '';
-                    if (base && base.length > 0) {
-                        const ch = base[0];
-                        if (/^[\u4e00-\u9fff]$/.test(ch)) defaultLabel = ch;
-                    }
-                } catch (e) {
-                    defaultLabel = '';
+            let confirmed = 0;
+            let conflicts = 0;
+            const remaining = [];
+            for (const item of pending) {
+                const label = item.default_label;
+                if (!isValidChar(label)) {
+                    remaining.push(item);
+                } else if (counts.get(label) > 1 || glyphs.has(label)) {
+                    conflicts++;
+                    remaining.push(item);
+                } else {
+                    glyphs.set(label, item.image_base64);
+                    confirmed++;
                 }
+            }
 
-                pending.push({
-                    id: `p_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-                    image_base64: result.image_base64,
-                    default_label: defaultLabel,
-                });
-
-                showToast('已添加到待确认', 'success');
-                updateUI();
-                switchTab('pending');
-            } catch (error) {
-                console.error('Upload failed:', error);
-                showToast('上传失败', 'error');
+            pending = remaining;
+            updateUI();
+            if (confirmed > 0) {
+                scheduleProjectSave();
+                debouncedGeneratePreview();
+            }
+            if (conflicts > 0) {
+                showToast(`已收录 ${confirmed} 个，${conflicts} 个重复字请手动确认`, 'error');
+            } else {
+                showToast(`已按文件名收录 ${confirmed} 个字`, confirmed > 0 ? 'success' : 'info');
             }
         }
 
-        // ===== Confirm =====
-        function confirmPending(id) {
-            const input = document.querySelector(`input[data-id="${id}"]`);
-            const label = input.value.trim();
-            if (!label) { showToast('请输入标准字', 'error'); return; }
-            if (!/^[\u4e00-\u9fff]$/.test(label)) { showToast('请输入单个汉字', 'error'); return; }
-
-            const item = pending.find(p => p.id === id);
-            if (!item) return;
-
-            // If char already exists, overwrite
-            glyphs.set(label, item.image_base64);
-            pending = pending.filter(p => p.id !== id);
-
-            showToast(`已收录: ${label}`, 'success');
-            updateUI();
-            // 不要在确认后自动切换到已收录标签，保留当前视图
-            debouncedGeneratePreview();
-        }
-
-        // ===== Delete =====
         function deletePending(id) {
-            pending = pending.filter(p => p.id !== id);
+            pending = pending.filter(item => item.id !== id);
             updateUI();
+            scheduleProjectSave();
         }
 
         function deleteConfirmed(char) {
             glyphs.delete(char);
             updateUI();
+            scheduleProjectSave();
             debouncedGeneratePreview();
         }
 
         // ===== Generate Preview =====
-        let previewGenerating = false;
-
         function debouncedGeneratePreview() {
+            previewRequestVersion++;
             clearTimeout(previewDebounce);
             previewDebounce = setTimeout(generatePreview, 500);
         }
 
         async function generatePreview() {
-            if (glyphs.size === 0 || previewGenerating) return;
+            const requestVersion = ++previewRequestVersion;
+            if (glyphs.size === 0) {
+                clearDynamicPreview();
+                return;
+            }
+            if (previewGenerating) {
+                previewNeedsRerun = true;
+                return;
+            }
             previewGenerating = true;
+            previewNeedsRerun = false;
 
             try {
-                const glyphList = [];
-                for (const [char, img_b64] of glyphs) {
-                    glyphList.push({ char, image_base64: img_b64 });
-                }
-
                 const response = await fetch(`${API_BASE}/preview`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ glyphs: glyphList, font_name: fontName }),
+                    body: JSON.stringify({
+                        glyphs: [...glyphs.entries()].map(([char, image_base64]) => ({ char, image_base64 })),
+                        font_name: fontName,
+                    }),
                 });
-
-                if (!response.ok) return;
+                if (!response.ok) throw new Error(await readErrorDetail(response, '预览生成失败'));
 
                 const blob = await response.blob();
-                fontVersion++;
-                const url = URL.createObjectURL(blob);
-
-                const old = document.getElementById('dynamicFont');
-                if (old) old.remove();
+                if (requestVersion !== previewRequestVersion || glyphs.size === 0) return;
+                clearDynamicPreview();
+                previewObjectUrl = URL.createObjectURL(blob);
 
                 const style = document.createElement('style');
                 style.id = 'dynamicFont';
-                style.textContent = `@font-face { font-family: 'PreviewFont'; src: url('${url}') format('truetype'); }`;
+                style.textContent = `@font-face { font-family: 'PreviewFont'; src: url('${previewObjectUrl}') format('truetype'); }`;
                 document.head.appendChild(style);
 
                 updatePreviewText();
@@ -999,46 +1450,58 @@
                 fontStatus.textContent = `已收录 ${glyphs.size} 个字`;
             } catch (error) {
                 console.error('Preview failed:', error);
+                fontStatus.textContent = '预览生成失败，可稍后重试';
             } finally {
                 previewGenerating = false;
+                if (previewNeedsRerun) generatePreview();
+            }
+        }
+
+        function clearDynamicPreview() {
+            document.getElementById('dynamicFont')?.remove();
+            if (previewObjectUrl) {
+                URL.revokeObjectURL(previewObjectUrl);
+                previewObjectUrl = null;
+            }
+            if (glyphs.size === 0) {
+                downloadFontBtn.style.display = 'none';
+                fontStatus.textContent = '收录文字后生成预览';
             }
         }
 
         // ===== Download =====
-        async function downloadFont(e) {
-            e.preventDefault();
-            if (glyphs.size === 0) { showToast('没有已收录的字', 'error'); return; }
-
-            showToast('正在生成字体...', 'info');
-            const glyphList = [];
-            for (const [char, img_b64] of glyphs) {
-                glyphList.push({ char, image_base64: img_b64 });
+        async function downloadFont(event) {
+            event.preventDefault();
+            if (glyphs.size === 0) {
+                showToast('没有已收录的字', 'error');
+                return;
             }
 
+            showToast('正在生成字体…', 'info');
             try {
                 const response = await fetch(`${API_BASE}/generate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ glyphs: glyphList, font_name: fontName }),
+                    body: JSON.stringify({
+                        glyphs: [...glyphs.entries()].map(([char, image_base64]) => ({ char, image_base64 })),
+                        font_name: fontName,
+                    }),
                 });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    showToast(error.detail || '生成失败', 'error');
-                    return;
-                }
+                if (!response.ok) throw new Error(await readErrorDetail(response, '生成失败'));
 
                 const blob = await response.blob();
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${fontName}.ttf`;
-                a.click();
-                URL.revokeObjectURL(url);
+                const anchor = document.createElement('a');
+                anchor.href = url;
+                anchor.download = `${safeFilename(fontName)}.ttf`;
+                document.body.appendChild(anchor);
+                anchor.click();
+                anchor.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
                 showToast('字体下载成功', 'success');
             } catch (error) {
                 console.error('Download failed:', error);
-                showToast('下载失败', 'error');
+                showToast(error.message || '下载失败', 'error');
             }
         }
 
@@ -1047,14 +1510,24 @@
             glyphCount.textContent = glyphs.size;
             document.getElementById('pendingCount').textContent = `(${pending.length})`;
             document.getElementById('confirmedCount').textContent = `(${glyphs.size})`;
+            document.getElementById('exportProjectBtn').disabled = pending.length === 0 && glyphs.size === 0;
+            document.getElementById('newProjectBtn').disabled = pending.length === 0 && glyphs.size === 0;
 
-            if (glyphs.size === 0) {
-                downloadFontBtn.style.display = 'none';
-                fontStatus.textContent = '收录文字后生成预览';
-            }
-
+            if (glyphs.size === 0) clearDynamicPreview();
             renderPendingGrid();
             renderConfirmedGrid();
+            updateBatchActions();
+            filterSidebar();
+        }
+
+        function updateBatchActions() {
+            const activeTab = document.querySelector('.tab.active')?.dataset.tab || 'pending';
+            const namedCount = pending.filter(item => isValidChar(item.default_label)).length;
+            const batchActions = document.getElementById('batchActions');
+            batchActions.hidden = activeTab !== 'pending' || namedCount === 0;
+            document.getElementById('batchHint').textContent = namedCount > 0
+                ? `${namedCount} 个图片已从文件名识别汉字；重复字会保留待确认`
+                : '';
         }
 
         function renderPendingGrid() {
@@ -1071,11 +1544,10 @@
             pending.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'char-card';
-                const defaultVal = item.default_label ? item.default_label : '';
                 card.innerHTML = `
-                    <div class="char-image"><img src="data:image/png;base64,${item.image_base64}" alt="Pending"></div>
+                    <div class="char-image"><img src="data:image/png;base64,${item.image_base64}" alt="待确认字形"></div>
                     <div class="char-content">
-                        <input type="text" class="char-input" data-id="${item.id}" placeholder="输入标准字" maxlength="1" value="${defaultVal}">
+                        <input type="text" class="char-input" data-id="${item.id}" placeholder="输入标准字" maxlength="1" value="${item.default_label || ''}">
                         <div class="char-actions">
                             <button class="btn btn-success confirm-btn" data-id="${item.id}">确认</button>
                             <button class="btn btn-danger-outline delete-btn" data-id="${item.id}">删除</button>
@@ -1084,11 +1556,24 @@
                 pendingGrid.appendChild(card);
             });
 
-            pendingGrid.querySelectorAll('.confirm-btn').forEach(btn => {
-                btn.addEventListener('click', () => confirmPending(btn.dataset.id));
+            pendingGrid.querySelectorAll('.char-input').forEach(input => {
+                input.addEventListener('input', () => {
+                    const item = pending.find(entry => entry.id === input.dataset.id);
+                    if (item) {
+                        item.default_label = input.value.trim();
+                        scheduleProjectSave();
+                        updateBatchActions();
+                    }
+                });
+                input.addEventListener('keydown', event => {
+                    if (event.key === 'Enter') confirmPending(input.dataset.id);
+                });
             });
-            pendingGrid.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', () => deletePending(btn.dataset.id));
+            pendingGrid.querySelectorAll('.confirm-btn').forEach(button => {
+                button.addEventListener('click', () => confirmPending(button.dataset.id));
+            });
+            pendingGrid.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', () => deletePending(button.dataset.id));
             });
         }
 
@@ -1104,11 +1589,11 @@
             }
 
             const sorted = [...glyphs.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-            sorted.forEach(([char, img_b64]) => {
+            sorted.forEach(([char, imageBase64]) => {
                 const card = document.createElement('div');
                 card.className = 'char-card confirmed-char';
                 card.innerHTML = `
-                    <div class="char-image"><img src="data:image/png;base64,${img_b64}" alt="${char}"></div>
+                    <div class="char-image"><img src="data:image/png;base64,${imageBase64}" alt="${char}"></div>
                     <div class="confirmed-label">${char}</div>
                     <div class="confirmed-actions">
                         <button class="btn btn-danger-outline" data-char="${char}">删除</button>
@@ -1116,51 +1601,56 @@
                 confirmedGrid.appendChild(card);
             });
 
-            confirmedGrid.querySelectorAll('.btn-danger-outline').forEach(btn => {
-                btn.addEventListener('click', () => deleteConfirmed(btn.dataset.char));
+            confirmedGrid.querySelectorAll('.btn-danger-outline').forEach(button => {
+                button.addEventListener('click', () => deleteConfirmed(button.dataset.char));
             });
         }
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-            pendingGrid.style.display = tab === 'pending' ? 'grid' : 'none';
-            confirmedGrid.style.display = tab === 'confirmed' ? 'grid' : 'none';
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            pendingGrid.style.display = tabName === 'pending' ? 'grid' : 'none';
+            confirmedGrid.style.display = tabName === 'confirmed' ? 'grid' : 'none';
+            updateBatchActions();
             filterSidebar();
         }
 
         function filterSidebar() {
             const query = document.getElementById('charSearch').value.trim();
-            const activeTab = document.querySelector('.tab.active').dataset.tab;
+            const activeTab = document.querySelector('.tab.active')?.dataset.tab || 'pending';
             const grid = activeTab === 'pending' ? pendingGrid : confirmedGrid;
             const cards = grid.querySelectorAll('.char-card');
-
-            if (!query) {
-                cards.forEach(card => card.style.display = '');
-                return;
-            }
 
             cards.forEach(card => {
                 const label = activeTab === 'pending'
                     ? card.querySelector('.char-input')?.value
                     : card.querySelector('.confirmed-label')?.textContent;
-                if (label && label.includes(query)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
+                card.style.display = !query || label?.includes(query) ? '' : 'none';
             });
         }
 
         function updatePreviewText() {
             const text = previewInput.value || '请输入预览文字';
-            const size = document.getElementById('fontSize').value + 'px';
-            const customEl = document.getElementById('previewCustom');
-            const systemEl = document.getElementById('previewSystem');
-            customEl.style.fontSize = size;
-            systemEl.style.fontSize = size;
-            customEl.textContent = text;
-            systemEl.textContent = text;
+            const size = `${document.getElementById('fontSize').value}px`;
+            const customElement = document.getElementById('previewCustom');
+            const systemElement = document.getElementById('previewSystem');
+            customElement.style.fontSize = size;
+            systemElement.style.fontSize = size;
+            customElement.textContent = text;
+            systemElement.textContent = text;
+        }
+
+        async function readErrorDetail(response, fallback) {
+            try {
+                const error = await response.json();
+                return error.detail || fallback;
+            } catch {
+                return fallback;
+            }
+        }
+
+        function safeFilename(value) {
+            return (value || '未命名字体').replace(/[\\/:*?"<>|]+/g, '_').slice(0, 80);
         }
 
         function showToast(message, type = 'info') {
@@ -1168,7 +1658,7 @@
             toast.className = `toast toast-${type}`;
             toast.textContent = message;
             document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
+            setTimeout(() => toast.remove(), 2800);
         }
     </script>
 </body>
