@@ -34,10 +34,11 @@ class RequestGuardMiddleware:
             b"content-security-policy",
             (
                 b"default-src 'self'; base-uri 'self'; object-src 'none'; "
-                b"frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; "
+                b"frame-ancestors 'none'; "
+                b"script-src 'self' 'unsafe-inline' https://ops.chathappy.cn; "
                 b"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
                 b"font-src 'self' data: blob: https://fonts.gstatic.com; "
-                b"img-src 'self' data: blob:; connect-src 'self'"
+                b"img-src 'self' data: blob:; connect-src 'self' https://ops.chathappy.cn"
             ),
         ),
     )

@@ -39,6 +39,7 @@ async def test_health_and_security_headers(client: AsyncClient) -> None:
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["x-frame-options"] == "DENY"
     assert "content-security-policy" in response.headers
+    assert "https://ops.chathappy.cn" in response.headers["content-security-policy"]
     assert "access-control-allow-origin" not in response.headers
     assert app.version == APP_VERSION
 
