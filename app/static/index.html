@@ -14,6 +14,7 @@
     <meta name="twitter:card" content="summary">
     <link rel="canonical" href="https://font.chathappy.cn/">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <script defer src="https://ops.chathappy.cn/sdk.js" data-project="autotextdesign"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
@@ -683,7 +684,7 @@
                 <input type="text" id="fontNameInput" class="font-name-input" value="未命名字体" placeholder="输入字体名称">
                 <div class="toolbar-divider"></div>
                 <button id="importProjectBtn" class="btn btn-secondary">导入项目</button>
-                <button id="exportProjectBtn" class="btn btn-secondary">导出项目</button>
+                <button id="exportProjectBtn" class="btn btn-secondary" data-ops-event="export_project">导出项目</button>
                 <button id="importTtfBtn" class="btn btn-secondary">导入 TTF</button>
                 <button id="newProjectBtn" class="btn btn-danger-outline">清空当前</button>
                 <div class="toolbar-divider"></div>
@@ -694,7 +695,7 @@
             <!-- Upload -->
             <div class="upload-section">
                 <div class="section-title">上传字体图片</div>
-                <div class="upload-area" id="uploadArea">
+                <div class="upload-area" id="uploadArea" role="button" data-ops-event="upload_images">
                     <div class="upload-icon">墨</div>
                     <div class="upload-title">拖拽、点击或粘贴单字图片</div>
                         <div style="margin-top:0.75rem; display:flex; gap:0.5rem; justify-content:center; align-items:center;">
@@ -722,7 +723,7 @@
             <div class="preview-section" id="previewSection">
                 <h3>字体预览</h3>
                 <div class="preview-toolbar">
-                    <a id="downloadFontBtn" class="btn btn-primary" style="display: none; text-decoration: none;">下载字体</a>
+                    <a id="downloadFontBtn" class="btn btn-primary" data-ops-event="download_font" style="display: none; text-decoration: none;">下载字体</a>
                     <span id="fontStatus" class="font-status">收录文字后生成预览</span>
                 </div>
                 <textarea id="previewInput" class="preview-textarea" rows="2" placeholder="输入预览文字...">书法字体制作器</textarea>
