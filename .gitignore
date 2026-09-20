@@ -54,3 +54,6 @@ htmlcov/
 # Build artifacts
 *.app
 *.zip
+
+# Playwright/browser 测试临时产物
+.playwright-mcp/
