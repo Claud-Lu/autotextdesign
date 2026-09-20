@@ -99,7 +99,7 @@ async def test_static_cache_control_headers(client: AsyncClient) -> None:
     assert html_response.status_code == 200
     assert html_response.headers["cache-control"] == "public, max-age=300, s-maxage=3600"
 
-    font_response = await client.get("/fonts/zhi-mang-xing.woff2")
+    font_response = await client.get("/fonts/zhi-mang-xing-v1.woff2")
     assert font_response.status_code == 200
     assert font_response.headers["cache-control"] == "public, max-age=31536000, immutable"
 
