@@ -27,6 +27,7 @@ data/
 *.woff
 *.woff2
 
+!app/static/fonts/*.woff2
 # IDE
 .vscode/
 .idea/
