@@ -118,7 +118,7 @@ async def test_index_html_seo_elements(client: AsyncClient) -> None:
     assert "<h1 class=\"logo\">书法字体制作器</h1>" in body
     assert 'property="og:image"' in body
     assert "FAQPage" in body
-    assert "zhi-mang-xing.woff2" in body
+    assert "zhi-mang-xing-v1.woff2" in body
     assert "fonts.googleapis.com" not in body
     assert "https://fonts.gstatic.com" not in body
     csp = response.headers["content-security-policy"]
