@@ -2,7 +2,7 @@
 from typing import Final
 
 # 应用版本
-APP_VERSION: Final = "1.2.0"
+APP_VERSION: Final = "1.3.0"
 
 # 字体度量参数
 UNITS_PER_EM: Final = 1000

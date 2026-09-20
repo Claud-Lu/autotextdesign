@@ -94,6 +94,38 @@ async def test_generate_endpoint(client: AsyncClient, image_base64: str) -> None
     assert response.content[:4] == b"\x00\x01\x00\x00"
 
 
+async def test_static_cache_control_headers(client: AsyncClient) -> None:
+    html_response = await client.get("/")
+    assert html_response.status_code == 200
+    assert html_response.headers["cache-control"] == "public, max-age=300, s-maxage=3600"
+
+    font_response = await client.get("/fonts/zhi-mang-xing.woff2")
+    assert font_response.status_code == 200
+    assert font_response.headers["cache-control"] == "public, max-age=31536000, immutable"
+
+    image_response = await client.get("/og-image.png")
+    assert image_response.status_code == 200
+    assert image_response.headers["cache-control"] == "public, max-age=86400"
+
+    health_response = await client.get("/api/health")
+    assert "cache-control" not in health_response.headers
+
+
+async def test_index_html_seo_elements(client: AsyncClient) -> None:
+    response = await client.get("/")
+    body = response.text
+
+    assert "<h1 class=\"logo\">书法字体制作器</h1>" in body
+    assert 'property="og:image"' in body
+    assert "FAQPage" in body
+    assert "zhi-mang-xing.woff2" in body
+    assert "fonts.googleapis.com" not in body
+    assert "https://fonts.gstatic.com" not in body
+    csp = response.headers["content-security-policy"]
+    assert "fonts.googleapis.com" not in csp
+    assert "fonts.gstatic.com" not in csp
+
+
 async def test_generate_rejects_duplicate_characters(
     client: AsyncClient,
     image_base64: str,

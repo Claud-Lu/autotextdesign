@@ -1,0 +1,71 @@
+/* 主题 · 现代极简：纯白底、无衬线、黑白灰，工具感 */
+:root {
+    --cinnabar: #18181B;
+    --cinnabar-deep: #000000;
+    --cinnabar-light: rgba(24, 24, 27, 0.045);
+    --ink: #18181B;
+    --ink-secondary: #3F3F46;
+    --ink-muted: #71717A;
+    --ink-faint: #A1A1AA;
+    --paper: #FAFAFA;
+    --card: #FFFFFF;
+    --card-alt: #F4F4F5;
+    --gold: #18181B;
+    --gold-light: rgba(24, 24, 27, 0.05);
+    --success: #16A34A;
+    --error: #DC2626;
+    --border: #E4E4E7;
+    --border-light: #EDEDEF;
+    --radius: 8px;
+    --radius-sm: 6px;
+    --shadow-sm: none;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.10);
+}
+
+body {
+    font-family: -apple-system, "PingFang SC", "Inter", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+    background: var(--paper);
+    background-image: none;
+    letter-spacing: 0.01em;
+}
+
+.header { background: #FFFFFF; color: var(--ink); }
+.header-content { border-bottom: 1px solid var(--border); }
+
+.logo {
+    font-family: inherit;
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.header-actions a { color: var(--ink-faint); }
+.header-actions a:hover { color: var(--ink); }
+
+.btn { border-radius: var(--radius-sm); }
+.btn-primary { background: var(--cinnabar); color: #fff; }
+.btn-primary:hover { background: var(--cinnabar-deep); }
+.btn-ghost { background: var(--card-alt); color: var(--ink-secondary); }
+.btn-ghost:hover { background: var(--border-light); color: var(--ink); }
+.btn-secondary { background: #FFFFFF; color: var(--ink-secondary); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+
+.notice-bar {
+    background: var(--card-alt);
+    border: 1px solid var(--border-light);
+}
+
+.upload-area { border-style: dashed; }
+.upload-icon { font-family: "Zhi Mang Xing", "KaiTi", serif; }
+
+.char-input { font-weight: 600; }
+
+.preview-textarea, .preview-area, .char-input, .font-name-input,
+.sidebar-search input, .preview-toolbar select, .strategy-select {
+    font-family: inherit;
+}
+
+.confirmed-label { font-family: "Zhi Mang Xing", "KaiTi", serif; font-weight: 400; }
+
+.toast { background: var(--ink); color: #FAFAFA; }

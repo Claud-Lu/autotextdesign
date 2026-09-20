@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-20
+
+### Added
+
+- 页面 SEO 内容区：差异化定位说明、使用教程、适用人群和常见问题（FAQ），新增 FAQPage 结构化数据。
+- `og-image.png` 分享预览图与完整的 Open Graph / Twitter Card 大图元信息。
+- IndexNow 密钥文件，用于必应等搜索引擎主动收录。
+- 静态资源 Cache-Control：字体一年不可变缓存、图片等一天、HTML 短缓存并带 `s-maxage` 供 CDN 边缘缓存。
+
+### Changed
+
+- 站名与区块标题改为语义化 H1/H2 层级，补充面向长尾关键词的标题和描述。
+- 志莽行书（Zhi Mang Xing，OFL）改为自托管子集字体（2.7KB），不再依赖 Google Fonts，改善国内加载；CSP 移除 `fonts.googleapis.com` / `fonts.gstatic.com`。
+
 ## [1.2.0] - 2026-07-29
 
 ### Added

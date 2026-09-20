@@ -3,21 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>书法字体制作器</title>
-    <meta name="description" content="免费在线把手写或书法单字图片转换为可安装的 TTF 字体。支持批量上传、自动去噪、本地保存和项目文件备份。">
-    <meta name="keywords" content="书法字体,手写字体,字体制作器,TTF,字体生成,在线工具">
+    <title>书法字体制作器 - 免费在线手写字体生成 TTF 工具</title>
+    <meta name="description" content="免费在线把手写或书法单字图片转换为可安装的 TTF 字体。支持批量上传、自动去噪、本地保存和项目文件备份，无需注册，服务器不保存数据。">
+    <meta name="keywords" content="书法字体,手写字体,手写字体制作,图片转字体,字体制作器,TTF,字体生成,在线字体工具,自制字体">
     <meta name="theme-color" content="#1C1917">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="书法字体制作器">
+    <meta property="og:title" content="书法字体制作器 - 把你的手写字变成可安装的 TTF 字体">
     <meta property="og:description" content="批量上传手写单字图片，自动处理并生成可安装的 TTF 字体。无需注册，项目保存在本地。">
     <meta property="og:url" content="https://font.chathappy.cn/">
-    <meta name="twitter:card" content="summary">
+    <meta property="og:image" content="https://font.chathappy.cn/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="书法字体制作器：手写字图片一键生成 TTF 字体">
+    <meta property="og:site_name" content="书法字体制作器">
+    <meta property="og:locale" content="zh_CN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="书法字体制作器 - 免费在线手写字体生成 TTF 工具">
+    <meta name="twitter:description" content="把手写或书法单字图片转换成可安装的 TTF 字体，无需注册，服务器不保存数据。">
+    <meta name="twitter:image" content="https://font.chathappy.cn/og-image.png">
     <link rel="canonical" href="https://font.chathappy.cn/">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <script defer src="https://ops.chathappy.cn/sdk.js" data-project="autotextdesign"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -27,12 +33,87 @@
             "applicationCategory": "DesignApplication",
             "operatingSystem": "Web",
             "isAccessibleForFree": true,
-            "description": "将手写或书法单字图片转换为可安装的 TTF 字体。"
+            "inLanguage": "zh-CN",
+            "description": "将手写或书法单字图片转换为可安装的 TTF 字体。",
+            "screenshot": "https://font.chathappy.cn/og-image.png",
+            "featureList": [
+                "批量上传手写单字图片",
+                "自动去噪、裁剪和矢量化",
+                "与系统楷体并排预览",
+                "导出可安装的 TTF 字体文件",
+                "项目数据本地保存，服务器不留存"
+            ],
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+        }
+    </script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "怎么把手写字做成字体？",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "把每个字单独写在白纸上拍照或扫描，图片按对应汉字命名（如 永.png），批量上传到本工具，确认收录后点击下载字体，即可得到可安装的 TTF 字体文件。"
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "做一套字体需要多少个字？",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "做多少用多少：先收录常用的几十到几百个字就能在聊天和文档里日常使用；想覆盖更全可以逐步补充，工具支持最多 5000 字，并可用项目文件备份、分多次完成。"
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "上传的图片有什么要求？",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "一张图片一个字，字迹清晰、尽量端正即可。支持 PNG、JPG、WebP、BMP 格式，单张最大 10MB。工具提供扫描稿、手机拍照、纹理纸张等多种自动预处理方式去噪和去背景。"
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "我的手写数据会被保存吗？",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "不会。本工具无需注册登录，服务器只做即时图像处理，不保存上传图片、项目文件或生成的字体；制作进度自动保存在你自己的浏览器里，也可以导出项目文件备份。"
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "生成的 TTF 字体怎么安装？",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Windows 双击字体文件选择“安装”；macOS 双击后在字体册中点“安装”；安装后在 Word、微信、Photoshop 等所有软件里都能选用你自己的手写体。"
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "和在线书法字体转换器有什么区别？",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "书法字体转换器是把输入的文字显示成王羲之、颜真卿等现成名家风格；本工具是把“你自己写的字”制成真正属于你的 TTF 字体文件，装进系统后任何软件都能使用，适合做个人手写体、纪念字体和礼物。"
+                    }
+                }
+            ]
         }
     </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         [hidden] { display: none !important; }
+
+        /* 自托管子集字体（志莽行书，OFL 开源）：仅含站名用字，避免依赖 Google Fonts 影响国内加载 */
+        @font-face {
+            font-family: "Zhi Mang Xing";
+            src: url("/fonts/zhi-mang-xing.woff2") format("woff2");
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
 
         :root {
             --cinnabar: #B8433A;
@@ -493,7 +574,7 @@
             box-shadow: var(--shadow-sm);
         }
 
-        .preview-section h3 {
+        .preview-section h2 {
             font-size: 0.9375rem;
             font-weight: 600;
             letter-spacing: 0.05em;
@@ -501,7 +582,7 @@
             color: var(--ink-secondary);
             display: flex; align-items: center; gap: 0.5rem;
         }
-        .preview-section h3::before {
+        .preview-section h2::before {
             content: '';
             width: 3px; height: 1em;
             background: var(--gold);
@@ -627,6 +708,32 @@
         .footer { text-align: center; padding: 2.5rem 2rem; color: var(--ink-faint); font-size: 0.75rem; letter-spacing: 0.05em; }
         .footer strong { color: var(--ink-muted); }
 
+        /* SEO 内容区 */
+        .seo-section { border-top: 1px solid var(--border-light); background: var(--card); }
+        .seo-inner { max-width: 960px; margin: 0 auto; padding: 3rem 2rem; }
+        .seo-heading { font-size: 1.375rem; font-weight: 600; text-align: center; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+        .seo-heading::after { content: ''; display: block; width: 40px; height: 2px; background: var(--gold); border-radius: 1px; margin: 0.875rem auto 0; }
+        .seo-lead { font-size: 0.9375rem; color: var(--ink-secondary); line-height: 2; text-align: center; max-width: 720px; margin: 0 auto 2.25rem; }
+        .seo-lead strong { color: var(--cinnabar); }
+        .seo-subheading { font-size: 1.0625rem; font-weight: 600; letter-spacing: 0.05em; margin: 2.25rem 0 1rem; padding-left: 0.625rem; border-left: 3px solid var(--gold); }
+        .seo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .seo-card { background: var(--card-alt); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 1.5rem; }
+        .seo-steps { list-style: none; counter-reset: step; display: flex; flex-direction: column; gap: 0.875rem; }
+        .seo-steps li { counter-increment: step; display: flex; gap: 0.75rem; font-size: 0.875rem; color: var(--ink-secondary); line-height: 1.8; }
+        .seo-steps li::before { content: counter(step); flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 0.8125rem; display: flex; align-items: center; justify-content: center; margin-top: 0.2rem; }
+        .seo-steps strong { color: var(--ink); }
+        .seo-audience { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+        .seo-audience li { font-size: 0.875rem; color: var(--ink-secondary); line-height: 1.8; padding-left: 1.25rem; position: relative; }
+        .seo-audience li::before { content: '墨'; position: absolute; left: 0; top: 0.15rem; color: var(--cinnabar); font-size: 0.75rem; }
+        .seo-faq { display: flex; flex-direction: column; gap: 0.75rem; }
+        .seo-faq details { background: var(--card-alt); border: 1px solid var(--border-light); border-radius: var(--radius-sm); overflow: hidden; }
+        .seo-faq summary { cursor: pointer; font-size: 0.9375rem; font-weight: 600; color: var(--ink); padding: 0.875rem 1.125rem; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .seo-faq summary::-webkit-details-marker { display: none; }
+        .seo-faq summary::after { content: '+'; color: var(--gold); font-size: 1.125rem; flex: none; transition: transform 0.2s; }
+        .seo-faq details[open] summary::after { transform: rotate(45deg); }
+        .seo-faq details p { font-size: 0.875rem; color: var(--ink-secondary); line-height: 1.9; padding: 0 1.125rem 1rem; }
+        .seo-note { font-size: 0.75rem; color: var(--ink-faint); text-align: center; margin-top: 2rem; letter-spacing: 0.03em; }
+
         .loading {
             display: inline-block;
             width: 16px; height: 16px;
@@ -650,16 +757,31 @@
             .toolbar-divider { width: 100%; height: 1px; }
             .toolbar .btn, .font-name-input { width: 100%; }
             .save-status { margin-left: 0; }
+            .seo-grid { grid-template-columns: 1fr; }
+            .seo-inner { padding: 2.25rem 1.25rem; }
         }
         @media (max-width: 640px) {
             .sidebar .character-grid { grid-template-columns: 1fr; }
         }
     </style>
+    <script>
+        (function () {
+            var THEMES = { minimal: '#FFFFFF', dark: '#141210', celadon: '#22403A' };
+            var t = new URLSearchParams(location.search).get('theme');
+            if (t) { try { localStorage.setItem('font-theme', t); } catch (e) {} }
+            else { try { t = localStorage.getItem('font-theme'); } catch (e) { t = null; } }
+            if (t && THEMES[t]) {
+                document.write('<link rel="stylesheet" href="/themes/' + t + '.css">');
+                var meta = document.querySelector('meta[name="theme-color"]');
+                if (meta) { meta.setAttribute('content', THEMES[t]); }
+            }
+        })();
+    </script>
 </head>
 <body>
     <header class="header">
         <div class="header-content">
-            <div class="logo">书法字体制作器</div>
+            <h1 class="logo">书法字体制作器</h1>
             <div class="header-actions">
                 <a href="https://github.com/Claud-Lu/autotextdesign" target="_blank" rel="noopener noreferrer" title="GitHub">
                     <svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -694,7 +816,7 @@
 
             <!-- Upload -->
             <div class="upload-section">
-                <div class="section-title">上传字体图片</div>
+                <h2 class="section-title">上传字体图片</h2>
                 <div class="upload-area" id="uploadArea" role="button" data-ops-event="upload_images">
                     <div class="upload-icon">墨</div>
                     <div class="upload-title">拖拽、点击或粘贴单字图片</div>
@@ -721,7 +843,7 @@
 
             <!-- Preview -->
             <div class="preview-section" id="previewSection">
-                <h3>字体预览</h3>
+                <h2>字体预览</h2>
                 <div class="preview-toolbar">
                     <a id="downloadFontBtn" class="btn btn-primary" data-ops-event="download_font" style="display: none; text-decoration: none;">下载字体</a>
                     <span id="fontStatus" class="font-status">收录文字后生成预览</span>
@@ -777,8 +899,73 @@
         </div>
     </main>
 
+    <!-- SEO 内容区：差异化说明 / 使用教程 / 适用人群 / 常见问题 -->
+    <section class="seo-section">
+        <div class="seo-inner">
+            <h2 class="seo-heading">把自己的手写字，做成真正能用的字体</h2>
+            <p class="seo-lead">
+                在线“书法字体转换器”只能把你打的字换成王羲之、颜真卿等现成风格；
+                这里做的是另一件事——<strong>把你亲手写的字制成属于你自己的 TTF 字体文件</strong>。
+                安装进系统后，在 Word、微信、Photoshop 里都能直接选用你的手写体。
+                全程免费、无需注册，服务器不保存任何数据。
+            </p>
+
+            <div class="seo-grid">
+                <div class="seo-card">
+                    <h3 class="seo-subheading">使用教程</h3>
+                    <ol class="seo-steps">
+                        <li><span><strong>写字拍图</strong>：每个字单独写在白纸上，拍照或扫描，图片按对应汉字命名（如 <em>永.png</em>）。</span></li>
+                        <li><span><strong>批量上传</strong>：把图片一起拖进页面，工具自动去噪、裁剪、居中，文件名会自动识别为对应汉字。</span></li>
+                        <li><span><strong>确认收录</strong>：在右侧检查每个字的效果，点击“按文件名全部收录”，重复或未识别的字单独确认。</span></li>
+                        <li><span><strong>预览对比</strong>：输入任意文字，与系统楷体并排预览你的字体效果。</span></li>
+                        <li><span><strong>下载安装</strong>：点击“下载字体”得到 TTF 文件，双击安装；再导出项目文件备份，随时回来续做。</span></li>
+                    </ol>
+                </div>
+                <div class="seo-card">
+                    <h3 class="seo-subheading">适合谁用</h3>
+                    <ul class="seo-audience">
+                        <li>书法爱好者：把日常习字沉淀成一套自己的专属字库。</li>
+                        <li>手写与手账玩家：做一套手写体用于笔记、拼贴和贺卡。</li>
+                        <li>想送特别礼物的人：收录家人的字，做成有纪念意义的字体。</li>
+                        <li>教师与内容创作者：制作班级字帖、品牌感更强的标题字。</li>
+                        <li>设计从业者：快速把手写草稿转成可安装、可商用的字体资产。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="seo-subheading">常见问题</h3>
+            <div class="seo-faq">
+                <details>
+                    <summary>怎么把手写字做成字体？</summary>
+                    <p>把每个字单独写在白纸上拍照或扫描，图片按对应汉字命名（如 永.png），批量上传到本工具，确认收录后点击下载字体，即可得到可安装的 TTF 字体文件。</p>
+                </details>
+                <details>
+                    <summary>做一套字体需要多少个字？</summary>
+                    <p>做多少用多少：先收录常用的几十到几百个字就能在聊天和文档里日常使用；想覆盖更全可以逐步补充，工具支持最多 5000 字，并可用项目文件备份、分多次完成。</p>
+                </details>
+                <details>
+                    <summary>上传的图片有什么要求？</summary>
+                    <p>一张图片一个字，字迹清晰、尽量端正即可。支持 PNG、JPG、WebP、BMP 格式，单张最大 10MB。工具提供扫描稿、手机拍照、纹理纸张等多种自动预处理方式去噪和去背景。</p>
+                </details>
+                <details>
+                    <summary>我的手写数据会被保存吗？</summary>
+                    <p>不会。本工具无需注册登录，服务器只做即时图像处理，不保存上传图片、项目文件或生成的字体；制作进度自动保存在你自己的浏览器里，也可以导出项目文件备份。</p>
+                </details>
+                <details>
+                    <summary>生成的 TTF 字体怎么安装？</summary>
+                    <p>Windows 双击字体文件选择“安装”；macOS 双击后在字体册中点“安装”；安装后在 Word、微信、Photoshop 等所有软件里都能选用你自己的手写体。</p>
+                </details>
+                <details>
+                    <summary>和在线书法字体转换器有什么区别？</summary>
+                    <p>书法字体转换器是把输入的文字显示成王羲之、颜真卿等现成名家风格；本工具是把“你自己写的字”制成真正属于你的 TTF 字体文件，装进系统后任何软件都能使用，适合做个人手写体、纪念字体和礼物。</p>
+                </details>
+            </div>
+            <p class="seo-note">手写字体制作由 书法字体制作器 提供 · 开源免费（MIT）· 数据只保存在你的浏览器</p>
+        </div>
+    </section>
+
     <footer class="footer">
-        <p>书法字体制作器 — 由 <strong>谷子、小兽</strong> 研发 <span style="margin-left: 0.5rem; color: var(--color-muted); font-size: 0.875rem;">v1.2.0</span></p>
+        <p>书法字体制作器 — 由 <strong>谷子、小兽</strong> 研发 <span style="margin-left: 0.5rem; color: var(--color-muted); font-size: 0.875rem;">v1.3.0</span></p>
     </footer>
 
     <!-- About Modal -->
